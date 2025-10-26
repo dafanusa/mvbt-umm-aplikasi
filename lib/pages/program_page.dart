@@ -200,8 +200,6 @@ class ProgramPage extends StatelessWidget {
                   ),
                 );
               }
-
-
               return RefreshIndicator(
                 onRefresh: controller.fetchPrograms,
                 child: SingleChildScrollView(
