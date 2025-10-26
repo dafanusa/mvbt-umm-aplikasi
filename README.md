@@ -1,16 +1,38 @@
-# demomobilemodul2
+# 🏐 Aplikasi Muhammadiyah Volleyball Team - Universitas Muhammadiyah Malang
 
-A new Flutter project.
+Aplikasi ini dikembangkan untuk **memanajemen kegiatan tim voli Universitas Muhammadiyah Malang (UMM)**.  
+Dibangun menggunakan **Flutter** dengan arsitektur **MVC + GetX**, serta integrasi **API (HTTP & Dio)** untuk pengelolaan **program kerja** dan **jadwal kegiatan**.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🎯 Tujuan Aplikasi
+Aplikasi ini bertujuan untuk:
+- Memudahkan **pengelolaan dan pendataan kegiatan voli** di lingkungan Universitas Muhammadiyah Malang.  
+- Menyediakan **informasi program kerja, jadwal latihan, dan pertandingan** secara terpusat dan mudah diakses.  
+- Meningkatkan **efisiensi komunikasi dan koordinasi** antar anggota tim voli.
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🚀 Fitur Utama
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 📋 1. Program Kerja
+- Menampilkan daftar **program kerja tim voli** yang sedang atau akan dilaksanakan.  
+- Setiap program menampilkan **judul, deskripsi, tanggal pelaksanaan, status, dan kondisi keaktifan**.  
+- Status kegiatan ditentukan otomatis berdasarkan tanggal atau status aktif (*Akan Datang*, *Sedang Berlangsung*, *Selesai*).  
+- Data diambil dari **API** menggunakan dua metode: **HTTP** dan **Dio**.
+
+### 🗓️ 2. Jadwal Kegiatan
+- Menyediakan menu **kalender kegiatan** yang menampilkan jadwal **latihan dan pertandingan** tim voli.  
+- Pengguna dapat melihat detail kegiatan berdasarkan tanggal.  
+- Membantu tim dalam **mengatur waktu latihan dan event pertandingan** agar lebih terorganisir.
+
+---
+## 📷 Preview Aplikasi
+
+### 📋 Halaman Program Kerja
+Menampilkan daftar program kerja lengkap beserta status dan deskripsi.
+![Program Kerja Page](assets/program_page.png)
+
+### 🗓️ Halaman Jadwal Kegiatan
+Menampilkan kalender berisi jadwal latihan dan pertandingan.
+![Jadwal Page](assets/jadwal_page.png)
