@@ -1,19 +1,30 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import '../models/program_model.dart';
 import '../services/api_http_service.dart';
 import '../services/api_dio_service.dart';
 
 class ProgramController extends GetxController {
+  // Data Program
   var httpProgramsAsync = <ProgramModel>[].obs;
   var dioProgramsAsync = <ProgramModel>[].obs;
   var httpProgramsCallback = <ProgramModel>[].obs;
+
+  // Loading States
   var isLoadingHttp = false.obs;
   var isLoadingDio = false.obs;
   var isLoadingCallback = false.obs;
 
+  // Status & Log
+  var statusCode = "".obs;
+  var statusMessage = "".obs;
+  var responseLog = "".obs;
+
   final ApiHttpService _httpService = ApiHttpService();
   final ApiDioService _dioService = ApiDioService();
-  final RxString apiMode = "http".obs;
+
+  // Mode API aktif
+  final RxString apiMode = "http".obs; // http | dio | callback
 
   void changeApiMode(String mode) {
     apiMode.value = mode;
@@ -22,21 +33,60 @@ class ProgramController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchProgramsHttpAsync();
-    fetchProgramsDioAsync();
-    fetchProgramsHttpCallbackChaining();
+    // Optional: otomatis load berdasarkan mode awal
+    fetchPrograms();
   }
 
+  /// PANGGILAN UTAMA
+  Future<void> fetchPrograms() async {
+    if (apiMode.value == "http") {
+      await fetchProgramsHttpAsync();
+    } else if (apiMode.value == "dio") {
+      await fetchProgramsDioAsync();
+    } else if (apiMode.value == "callback") {
+      await fetchProgramsHttpCallbackChaining();
+    }
+  }
+
+  /// HTTP ASYNC
   Future<void> fetchProgramsHttpAsync() async {
     isLoadingHttp.value = true;
     try {
-      httpProgramsAsync.value = await _httpService.fetchProgramsAsync();
+      final result = await _httpService.fetchProgramsWithStatus().timeout(
+        const Duration(seconds: 5),
+      );
+
+      httpProgramsAsync.value = result['data'];
+      statusCode.value = result['statusCode'].toString();
+      responseLog.value = result['raw'] ?? "";
+
+      if (result['statusCode'] == 200) {
+        statusMessage.value = "✅ HTTP Success";
+        Get.snackbar(
+          "Success (HTTP Async)",
+          "Memuat ${httpProgramsAsync.length} program via HTTP.",
+          duration: const Duration(seconds: 1),
+        );
+      } else {
+        statusMessage.value = "❌ HTTP Error (${result['statusCode']})";
+        Get.snackbar(
+          "HTTP Error",
+          "Status: ${result['statusCode']}",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } on TimeoutException {
+      statusMessage.value = "❌ HTTP Timeout";
+      responseLog.value =
+          "❌ HTTP Timeout: Server tidak merespon dalam 5 detik.";
       Get.snackbar(
-        "Success (HTTP Async)",
-        "Memuat ${httpProgramsAsync.length} programs via HTTP.",
-        duration: const Duration(seconds: 1),
+        "Timeout (HTTP)",
+        "Server tidak merespon dalam 5 detik.",
+        snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
+      statusMessage.value = "❌ HTTP Exception: $e";
+      responseLog.value = "❌ HTTP Exception: $e";
       Get.snackbar(
         "Error HTTP (Async)",
         e.toString(),
@@ -47,16 +97,44 @@ class ProgramController extends GetxController {
     }
   }
 
+  /// DIO ASYNC
   Future<void> fetchProgramsDioAsync() async {
     isLoadingDio.value = true;
     try {
-      dioProgramsAsync.value = await _dioService.fetchProgramsAsync();
-      Get.snackbar(
-        "Success (Dio Async)",
-        "Memuat ${dioProgramsAsync.length} programs via DIO.",
-        duration: const Duration(seconds: 1),
+      final result = await _dioService.fetchProgramsWithStatus().timeout(
+        const Duration(seconds: 5),
       );
-    } on Exception catch (e) {
+
+      dioProgramsAsync.value = result['data'];
+      statusCode.value = result['statusCode'].toString();
+      responseLog.value = result['raw'] ?? "";
+
+      if (result['statusCode'] == 200) {
+        statusMessage.value = "✅ Dio Success";
+        Get.snackbar(
+          "Success (Dio Async)",
+          "Memuat ${dioProgramsAsync.length} program via Dio.",
+          duration: const Duration(seconds: 1),
+        );
+      } else {
+        statusMessage.value = "❌ Dio Error (${result['statusCode']})";
+        Get.snackbar(
+          "Dio Error",
+          "Status: ${result['statusCode']}",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } on TimeoutException {
+      statusMessage.value = "❌ Dio Timeout";
+      responseLog.value = "❌ Dio Timeout: Server tidak merespon dalam 5 detik.";
+      Get.snackbar(
+        "Timeout (Dio)",
+        "Server tidak merespon dalam 5 detik.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      statusMessage.value = "❌ Dio Exception: $e";
+      responseLog.value = "❌ Dio Exception: $e";
       Get.snackbar(
         "Error Dio (Async)",
         e.toString(),
@@ -67,17 +145,45 @@ class ProgramController extends GetxController {
     }
   }
 
+  /// CALLBACK CHAINING
   Future<void> fetchProgramsHttpCallbackChaining() async {
     isLoadingCallback.value = true;
     try {
-      httpProgramsCallback.value = await _httpService
-          .fetchProgramsCallbackChaining();
+      final result = await _httpService
+          .fetchProgramsCallbackWithStatus()
+          .timeout(const Duration(seconds: 5));
+
+      httpProgramsCallback.value = result['data'];
+      statusCode.value = result['statusCode'].toString();
+      responseLog.value = result['raw'] ?? "";
+
+      if (result['statusCode'] == 200) {
+        statusMessage.value = "✅ Callback Success";
+        Get.snackbar(
+          "Success (Callback)",
+          "Memuat ${httpProgramsCallback.length} program via Callback.",
+          duration: const Duration(seconds: 1),
+        );
+      } else {
+        statusMessage.value = "❌ Callback Error (${result['statusCode']})";
+        Get.snackbar(
+          "Callback Error",
+          "Status: ${result['statusCode']}",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } on TimeoutException {
+      statusMessage.value = "❌ Callback Timeout";
+      responseLog.value =
+          "❌ Callback Timeout: Server tidak merespon dalam 5 detik.";
       Get.snackbar(
-        "Success (Callback)",
-        "Memuat ${httpProgramsCallback.length} programs via Callback Chaining.",
-        duration: const Duration(seconds: 1),
+        "Timeout (Callback)",
+        "Server tidak merespon dalam 5 detik.",
+        snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
+      statusMessage.value = "❌ Callback Exception: $e";
+      responseLog.value = "❌ Callback Exception: $e";
       Get.snackbar(
         "Error HTTP (Callback)",
         e.toString(),
