@@ -1,7 +1,7 @@
 # 🏐 Aplikasi Muhammadiyah Volleyball Team - Universitas Muhammadiyah Malang
 
 Aplikasi ini dikembangkan untuk **memanajemen kegiatan tim voli Universitas Muhammadiyah Malang (UMM)**.  
-Dibangun menggunakan **Flutter** dengan arsitektur **MVC + GetX**, serta integrasi **API (HTTP & Dio)** untuk pengelolaan **program kerja** dan **jadwal kegiatan**.
+Dibangun menggunakan **Flutter** untuk pengelolaan **program kerja** dan **jadwal kegiatan**.
 
 ---
 
