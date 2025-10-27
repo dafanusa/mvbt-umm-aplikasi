@@ -10,6 +10,7 @@ class ProgramPage extends StatelessWidget {
   final ProgramController controller = Get.put(ProgramController());
   final RxString _selectedFilter = "Semua".obs;
 
+  // ===================== FILTER BUTTON =====================
   Widget _buildFilterButton(
     String label,
     IconData icon,
@@ -74,6 +75,7 @@ class ProgramPage extends StatelessWidget {
     });
   }
 
+  // ===================== PROGRAM CARD =====================
   Widget _buildProgramCard(ProgramModel program, double screenWidth) {
     final status = program.status;
     return Container(
@@ -93,7 +95,6 @@ class ProgramPage extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -131,8 +132,8 @@ class ProgramPage extends StatelessWidget {
                 color: status == "Sedang Berlangsung"
                     ? Colors.green
                     : status == "Selesai"
-                    ? Colors.grey
-                    : Colors.orange,
+                        ? Colors.grey
+                        : Colors.orange,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -150,11 +151,12 @@ class ProgramPage extends StatelessWidget {
     );
   }
 
+  // ===================== API SELECTOR =====================
   Widget _buildApiSelector() {
     return Obx(() {
       return DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: const Color.fromARGB(255, 116, 0, 0),
+          dropdownColor: maroon,
           value: controller.apiMode.value,
           icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
           style: const TextStyle(color: Colors.white),
@@ -180,19 +182,83 @@ class ProgramPage extends StatelessWidget {
     });
   }
 
+  // ===================== LOG PANEL =====================
+  Widget _buildLogPanel() {
+    return Obx(() {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        margin: const EdgeInsets.only(top: 10, bottom: 16),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "🔍 Status Code: ${controller.statusCode.value}",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              controller.statusMessage.value,
+              style: TextStyle(
+                color: controller.statusMessage.value.contains("Success")
+                    ? Colors.green
+                    : Colors.red,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const Divider(),
+            Text(
+              "📄 Response Log:",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              constraints: const BoxConstraints(maxHeight: 180),
+              child: SingleChildScrollView(
+                child: Text(
+                  controller.responseLog.value.isEmpty
+                      ? "(belum ada respons)"
+                      : controller.responseLog.value,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: "monospace",
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  // ===================== BUILD =====================
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final double fontSize = screenWidth < 400
-        ? 12
-        : screenWidth < 900
-        ? 14
-        : 16;
-    final double paddingScale = screenWidth < 400
-        ? 0.8
-        : screenWidth < 900
-        ? 1.0
-        : 1.2;
+    final double fontSize =
+        screenWidth < 400 ? 12 : screenWidth < 900 ? 14 : 16;
+    final double paddingScale =
+        screenWidth < 400 ? 0.8 : screenWidth < 900 ? 1.0 : 1.2;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -222,39 +288,25 @@ class ProgramPage extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            double horizontalPadding = screenWidth < 500
-                ? 12
-                : screenWidth < 900
-                ? 32
-                : 80;
+            double horizontalPadding =
+                screenWidth < 500 ? 12 : screenWidth < 900 ? 32 : 80;
 
             return Obx(() {
               final mode = controller.apiMode.value;
               final isLoading = mode == "http"
                   ? controller.isLoadingHttp.value
                   : mode == "dio"
-                  ? controller.isLoadingDio.value
-                  : controller.isLoadingCallback.value;
+                      ? controller.isLoadingDio.value
+                      : controller.isLoadingCallback.value;
 
               final data = mode == "http"
                   ? controller.httpProgramsAsync
                   : mode == "dio"
-                  ? controller.dioProgramsAsync
-                  : controller.httpProgramsCallback;
+                      ? controller.dioProgramsAsync
+                      : controller.httpProgramsCallback;
 
               if (isLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (data.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Text(
-                      "Belum ada data.\nTekan tombol refresh 🔄 di pojok kanan atas.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                );
               }
 
               List<ProgramModel> filtered = data.where((p) {
@@ -283,12 +335,11 @@ class ProgramPage extends StatelessWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: horizontalPadding,
-                      vertical: 20,
-                    ),
+                        horizontal: horizontalPadding, vertical: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // === Header ===
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
@@ -320,97 +371,40 @@ class ProgramPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
 
+                        // === Filter Buttons ===
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final isWide = constraints.maxWidth > 900;
+                            final buttons = [
+                              _buildFilterButton("Semua", Icons.list_alt,
+                                  fontSize, paddingScale, screenWidth),
+                              _buildFilterButton("Akan Datang",
+                                  Icons.access_time, fontSize, paddingScale, screenWidth),
+                              _buildFilterButton("Berlangsung",
+                                  Icons.play_circle_fill, fontSize, paddingScale, screenWidth),
+                              _buildFilterButton("Selesai", Icons.check_circle,
+                                  fontSize, paddingScale, screenWidth),
+                            ];
 
-                            if (isWide) {
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Expanded(
-                                    child: _buildFilterButton(
-                                      "Semua",
-                                      Icons.list_alt,
-                                      fontSize,
-                                      paddingScale,
-                                      screenWidth,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: _buildFilterButton(
-                                      "Akan Datang",
-                                      Icons.access_time,
-                                      fontSize,
-                                      paddingScale,
-                                      screenWidth,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: _buildFilterButton(
-                                      "Berlangsung",
-                                      Icons.play_circle_fill,
-                                      fontSize,
-                                      paddingScale,
-                                      screenWidth,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: _buildFilterButton(
-                                      "Selesai",
-                                      Icons.check_circle,
-                                      fontSize,
-                                      paddingScale,
-                                      screenWidth,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  _buildFilterButton(
-                                    "Semua",
-                                    Icons.list_alt,
-                                    fontSize,
-                                    paddingScale,
-                                    screenWidth,
-                                  ),
-                                  _buildFilterButton(
-                                    "Akan Datang",
-                                    Icons.access_time,
-                                    fontSize,
-                                    paddingScale,
-                                    screenWidth,
-                                  ),
-                                  _buildFilterButton(
-                                    "Berlangsung",
-                                    Icons.play_circle_fill,
-                                    fontSize,
-                                    paddingScale,
-                                    screenWidth,
-                                  ),
-                                  _buildFilterButton(
-                                    "Selesai",
-                                    Icons.check_circle,
-                                    fontSize,
-                                    paddingScale,
-                                    screenWidth,
-                                  ),
-                                ],
-                              ),
-                            );
+                            return isWide
+                                ? Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: buttons,
+                                  )
+                                : SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(children: buttons),
+                                  );
                           },
                         ),
-                        const SizedBox(height: 24),
 
+                        // === Log Panel (baru) ===
+                        _buildLogPanel(),
+
+                        const SizedBox(height: 16),
+
+                        // === List Data ===
                         LayoutBuilder(
                           builder: (context, constraints) {
                             double cardWidth;
@@ -425,15 +419,13 @@ class ProgramPage extends StatelessWidget {
                             return Wrap(
                               spacing: 16,
                               runSpacing: 16,
-                              children: filtered.map((program) {
-                                return SizedBox(
-                                  width: cardWidth,
-                                  child: _buildProgramCard(
-                                    program,
-                                    screenWidth,
-                                  ),
-                                );
-                              }).toList(),
+                              children: filtered
+                                  .map((program) => SizedBox(
+                                        width: cardWidth,
+                                        child: _buildProgramCard(
+                                            program, screenWidth),
+                                      ))
+                                  .toList(),
                             );
                           },
                         ),
