@@ -4,6 +4,17 @@ Aplikasi ini dikembangkan untuk **memanajemen kegiatan tim voli Universitas Muha
 Dibangun menggunakan **Flutter** untuk pengelolaan **program kerja** dan **jadwal kegiatan**.
 
 ---
+## 📷 Preview Aplikasi
+
+### 📋 Halaman Program Kerja
+Menampilkan daftar program kerja lengkap beserta status dan deskripsi.
+![Program Kerja Page](assets/program_page.png)
+
+### 🗓️ Halaman Jadwal Kegiatan
+Menampilkan kalender berisi jadwal latihan dan pertandingan.
+![Jadwal Page](assets/jadwal_page.png)
+
+---
 
 ## 🎯 Tujuan Aplikasi
 Aplikasi ini bertujuan untuk:
@@ -27,12 +38,4 @@ Aplikasi ini bertujuan untuk:
 - Membantu tim dalam **mengatur waktu latihan dan event pertandingan** agar lebih terorganisir.
 
 ---
-## 📷 Preview Aplikasi
 
-### 📋 Halaman Program Kerja
-Menampilkan daftar program kerja lengkap beserta status dan deskripsi.
-![Program Kerja Page](assets/program_page.png)
-
-### 🗓️ Halaman Jadwal Kegiatan
-Menampilkan kalender berisi jadwal latihan dan pertandingan.
-![Jadwal Page](assets/jadwal_page.png)
