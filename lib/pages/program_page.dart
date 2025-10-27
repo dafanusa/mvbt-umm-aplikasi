@@ -10,7 +10,6 @@ class ProgramPage extends StatelessWidget {
   final ProgramController controller = Get.put(ProgramController());
   final RxString _selectedFilter = "Semua".obs;
 
-  // ===================== FILTER BUTTON =====================
   Widget _buildFilterButton(
     String label,
     IconData icon,
@@ -75,7 +74,6 @@ class ProgramPage extends StatelessWidget {
     });
   }
 
-  // ===================== PROGRAM CARD =====================
   Widget _buildProgramCard(ProgramModel program, double screenWidth) {
     final status = program.status;
     return Container(
@@ -151,7 +149,6 @@ class ProgramPage extends StatelessWidget {
     );
   }
 
-  // ===================== API SELECTOR =====================
   Widget _buildApiSelector() {
     return Obx(() {
       return DropdownButtonHideUnderline(
@@ -182,7 +179,6 @@ class ProgramPage extends StatelessWidget {
     });
   }
 
-  // ===================== LOG PANEL =====================
   Widget _buildLogPanel() {
     return Obx(() {
       return AnimatedContainer(
@@ -251,7 +247,6 @@ class ProgramPage extends StatelessWidget {
     });
   }
 
-  // ===================== BUILD =====================
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -339,7 +334,7 @@ class ProgramPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // === Header ===
+  
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
@@ -371,7 +366,6 @@ class ProgramPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
 
-                        // === Filter Buttons ===
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final isWide = constraints.maxWidth > 900;
@@ -398,13 +392,10 @@ class ProgramPage extends StatelessWidget {
                                   );
                           },
                         ),
-
-                        // === Log Panel (baru) ===
                         _buildLogPanel(),
 
                         const SizedBox(height: 16),
 
-                        // === List Data ===
                         LayoutBuilder(
                           builder: (context, constraints) {
                             double cardWidth;
