@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import '../controllers/program_controller.dart';
+import '../models/program_model.dart';
 
 class ProgramPage extends StatelessWidget {
   final Color maroon;
   ProgramPage({super.key, required this.maroon});
 
-  // 🔹 Tombol Filter Responsif
+  final ProgramController controller = Get.put(ProgramController());
+  final RxString _selectedFilter = "Semua".obs;
+
   Widget _buildFilterButton(
     String label,
     IconData icon,
@@ -22,6 +25,7 @@ class ProgramPage extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: isWideScreen ? 8 : 4),
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
+          onTap: () => _selectedFilter.value = label,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),
             padding: EdgeInsets.symmetric(
@@ -70,7 +74,6 @@ class ProgramPage extends StatelessWidget {
     });
   }
 
-  // 🔹 Card Program Dinamis
   Widget _buildProgramCard(ProgramModel program, double screenWidth) {
     final status = program.status;
     return Container(
@@ -147,6 +150,36 @@ class ProgramPage extends StatelessWidget {
     );
   }
 
+  Widget _buildApiSelector() {
+    return Obx(() {
+      return DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          dropdownColor: const Color.fromARGB(255, 116, 0, 0),
+          value: controller.apiMode.value,
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+          style: const TextStyle(color: Colors.white),
+          items: const [
+            DropdownMenuItem(value: "http", child: Text("HTTP")),
+            DropdownMenuItem(value: "dio", child: Text("Dio")),
+            DropdownMenuItem(value: "callback", child: Text("Callback")),
+          ],
+          onChanged: (value) {
+            if (value != null) {
+              controller.changeApiMode(value);
+              if (value == "http") {
+                controller.fetchProgramsHttpAsync();
+              } else if (value == "dio") {
+                controller.fetchProgramsDioAsync();
+              } else {
+                controller.fetchProgramsHttpCallbackChaining();
+              }
+            }
+          },
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -167,13 +200,23 @@ class ProgramPage extends StatelessWidget {
         backgroundColor: maroon,
         title: const Text(
           "Program Kerja",
-          style: TextStyle(
-            color: Colors.white, 
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
+          _buildApiSelector(),
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              if (controller.apiMode.value == "http") {
+                controller.fetchProgramsHttpAsync();
+              } else if (controller.apiMode.value == "dio") {
+                controller.fetchProgramsDioAsync();
+              } else {
+                controller.fetchProgramsHttpCallbackChaining();
+              }
+            },
+          ),
         ],
       ),
       body: SafeArea(
@@ -186,9 +229,22 @@ class ProgramPage extends StatelessWidget {
                 : 80;
 
             return Obx(() {
-              if (controller.isLoading.value) {
+              final mode = controller.apiMode.value;
+              final isLoading = mode == "http"
+                  ? controller.isLoadingHttp.value
+                  : mode == "dio"
+                  ? controller.isLoadingDio.value
+                  : controller.isLoadingCallback.value;
+
+              final data = mode == "http"
+                  ? controller.httpProgramsAsync
+                  : mode == "dio"
+                  ? controller.dioProgramsAsync
+                  : controller.httpProgramsCallback;
+
+              if (isLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (controller.programs.isEmpty) {
+              } else if (data.isEmpty) {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24),
@@ -200,8 +256,29 @@ class ProgramPage extends StatelessWidget {
                   ),
                 );
               }
+
+              List<ProgramModel> filtered = data.where((p) {
+                if (_selectedFilter.value == "Semua") return true;
+                if (_selectedFilter.value == "Akan Datang") {
+                  return p.status == "Akan Datang";
+                } else if (_selectedFilter.value == "Berlangsung") {
+                  return p.status == "Sedang Berlangsung";
+                } else if (_selectedFilter.value == "Selesai") {
+                  return p.status == "Selesai";
+                }
+                return false;
+              }).toList();
+
               return RefreshIndicator(
-                onRefresh: controller.fetchPrograms,
+                onRefresh: () async {
+                  if (controller.apiMode.value == "http") {
+                    await controller.fetchProgramsHttpAsync();
+                  } else if (controller.apiMode.value == "dio") {
+                    await controller.fetchProgramsDioAsync();
+                  } else {
+                    await controller.fetchProgramsHttpCallbackChaining();
+                  }
+                },
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Padding(
@@ -212,7 +289,6 @@ class ProgramPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
@@ -242,15 +318,12 @@ class ProgramPage extends StatelessWidget {
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 20),
 
-                        // 🔝 Tombol Filter Responsif
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final isWide = constraints.maxWidth > 900;
 
-                            // 🔹 kalau layar lebar (laptop), tombol filter dibentang penuh
                             if (isWide) {
                               return Row(
                                 mainAxisAlignment:
@@ -299,7 +372,6 @@ class ProgramPage extends StatelessWidget {
                               );
                             }
 
-                            // 🔹 kalau di HP, tetap bisa di-scroll horizontal
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -339,11 +411,9 @@ class ProgramPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
 
-                        // 🔹 Daftar Program (Wrap Layout)
                         LayoutBuilder(
                           builder: (context, constraints) {
                             double cardWidth;
-
                             if (screenWidth < 600) {
                               cardWidth = constraints.maxWidth;
                             } else if (screenWidth < 1000) {
