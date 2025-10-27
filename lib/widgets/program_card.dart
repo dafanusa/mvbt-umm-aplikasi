@@ -5,23 +5,24 @@ class ProgramCard extends StatelessWidget {
   final ProgramModel item;
   final Color maroon;
 
-  const ProgramCard({
-    super.key,
-    required this.item,
-    required this.maroon,
-  });
+  const ProgramCard({super.key, required this.item, required this.maroon});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isWide = screenWidth > 900;
 
-    // Penyesuaian tampilan berdasarkan lebar layar
-    final double titleSize = isWide ? 18 : screenWidth < 400 ? 14 : 16;
+    final double titleSize = isWide
+        ? 18
+        : screenWidth < 400
+        ? 14
+        : 16;
     final double descSize = isWide ? 14 : 12.5;
-    final double paddingScale = isWide ? 18 : screenWidth < 400 ? 12 : 14;
-
-    // Warna status otomatis
+    final double paddingScale = isWide
+        ? 18
+        : screenWidth < 400
+        ? 12
+        : 14;
     Color statusColor;
     switch (item.status) {
       case "Sedang Berlangsung":
@@ -52,10 +53,9 @@ class ProgramCard extends StatelessWidget {
             padding: EdgeInsets.all(paddingScale),
             child: IntrinsicHeight(
               child: Column(
-                mainAxisSize: MainAxisSize.min, // 🔹 Menyesuaikan isi card
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🔸 Judul
                   Text(
                     item.title,
                     style: TextStyle(
@@ -67,7 +67,6 @@ class ProgramCard extends StatelessWidget {
 
                   const SizedBox(height: 6),
 
-                  // 🔸 Deskripsi
                   Text(
                     item.description,
                     style: TextStyle(
@@ -78,12 +77,9 @@ class ProgramCard extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 10),
-
-                  // 🔸 Baris bawah (Tanggal dan Status)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 📅 Tanggal
                       Flexible(
                         child: Text(
                           "📅 ${item.date}",
@@ -98,10 +94,11 @@ class ProgramCard extends StatelessWidget {
 
                       const SizedBox(width: 8),
 
-                      // 🟩 Status (otomatis sesuai tanggal)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: statusColor,
                           borderRadius: BorderRadius.circular(10),

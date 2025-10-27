@@ -43,11 +43,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       floatingActionButton: _buildFloatingNavBar(),
     );
   }
-
-  // 🔹 Tambahkan padding bawah agar tidak ketutup oleh nav bar
   Widget _wrapWithBottomPadding(Widget page) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 90), // ruang di bawah nav bar
+      padding: const EdgeInsets.only(bottom: 90),
       child: page,
     );
   }
@@ -66,7 +64,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     return SafeArea(
       minimum: const EdgeInsets.only(bottom: 10),
       child: Padding(
-        // 🔹 Jarak kanan-kiri biar gak mepet
         padding: const EdgeInsets.symmetric(horizontal: 22),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -123,7 +120,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                           color: Colors.white,
                           fontSize: isActive
                               ? 13
-                              : 11, // 🔹 font sedikit lebih besar
+                              : 11, 
                           fontWeight: isActive
                               ? FontWeight.bold
                               : FontWeight.normal,
