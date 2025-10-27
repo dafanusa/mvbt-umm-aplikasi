@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../models/program_model.dart';
-import '../utils/app_constant.dart';
 
 class ApiDioService {
+  static const String baseUrl = "https://api-mvbtaplikasi-nodejs.vercel.app";
+  static const String endpointPrograms = "/programs";
+
   final Dio _dio = Dio();
 
   ApiDioService() {
-    _dio.options.baseUrl = baseUrlLocal;
+    _dio.options.baseUrl = baseUrl; 
     _dio.interceptors.add(
       LogInterceptor(requestBody: true, responseBody: true, error: true),
     );
@@ -15,7 +17,7 @@ class ApiDioService {
 
   Future<List<ProgramModel>> fetchProgramsAsync() async {
     try {
-      final response = await _dio.get('/programs');
+      final response = await _dio.get(endpointPrograms);
 
       final List data = response.data;
       return data.map((e) => ProgramModel.fromJson(e)).toList();
