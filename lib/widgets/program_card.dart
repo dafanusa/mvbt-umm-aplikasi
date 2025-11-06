@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/program_model.dart';
+import '../app/models/program_model.dart';
 
 class ProgramCard extends StatelessWidget {
   final ProgramModel item;

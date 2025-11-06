@@ -1,25 +1,17 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
+import 'package:get/get.dart';
+import '../controllers/register_controller.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterView extends StatefulWidget {
   final Color maroon;
-  const RegisterPage({super.key, required this.maroon});
+  const RegisterView({super.key, required this.maroon});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  final _email = TextEditingController();
-  final _password = TextEditingController();
-  final _confirmPassword = TextEditingController();
-
-  void _register() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => LoginPage(maroon: widget.maroon)),
-    );
-  }
+class _RegisterViewState extends State<RegisterView> {
+  final RegisterController controller = Get.put(RegisterController());
 
   @override
   Widget build(BuildContext context) {
@@ -80,33 +72,45 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
-                      _buildField('Email', _email),
+                      _buildField('Email', controller.emailController),
                       const SizedBox(height: 16),
-                      _buildField('Password', _password, isPassword: true),
+                      _buildField('Password', controller.passwordController,
+                          isPassword: true),
                       const SizedBox(height: 16),
-                      _buildField(
-                        'Konfirmasi Password',
-                        _confirmPassword,
-                        isPassword: true,
-                      ),
+                      _buildField('Konfirmasi Password',
+                          controller.confirmPasswordController,
+                          isPassword: true),
                       const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: _register,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.maroon,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      Obx(() {
+                        return ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : () => controller.register(widget.maroon),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: widget.maroon,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            minimumSize: const Size(double.infinity, 50),
                           ),
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
+                          child: controller.isLoading.value
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'Sign Up',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                        );
+                      }),
                       const SizedBox(height: 16),
                       GestureDetector(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => Get.back(),
                         child: const Text(
                           'Sudah punya akun?',
                           style: TextStyle(color: Colors.black54),

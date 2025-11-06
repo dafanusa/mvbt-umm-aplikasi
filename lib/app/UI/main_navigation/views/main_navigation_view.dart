@@ -1,66 +1,48 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'gallery_page.dart';
-import 'profile_page.dart';
-import 'program_page.dart';
-import 'jadwal_page.dart';
+import 'package:get/get.dart';
+import '../../home/views/home_view.dart';
+import '../../gallery/views/gallery_view.dart';
+import '../../profile/views/profile_view.dart';
+import '../../program/views/program_view.dart';
+import '../../jadwal/views/jadwal_view.dart';
+import '../controllers/main_navigation_controller.dart';
 
-class MainNavigationPage extends StatefulWidget {
+class MainNavigationView extends GetView<MainNavigationController> {
   final String username;
   final Color maroon;
 
-  const MainNavigationPage({
+  const MainNavigationView({
     super.key,
     required this.username,
     required this.maroon,
   });
 
   @override
-  _MainNavigationPageState createState() => _MainNavigationPageState();
-}
-
-class _MainNavigationPageState extends State<MainNavigationPage> {
-  int _index = 0;
-
-  @override
   Widget build(BuildContext context) {
     final pages = [
-      _wrapWithBottomPadding(
-        HomePage(username: widget.username, maroon: widget.maroon),
-      ),
-      _wrapWithBottomPadding(ProgramPage(maroon: widget.maroon)),
-      _wrapWithBottomPadding(JadwalPage(maroon: widget.maroon)),
-      _wrapWithBottomPadding(GalleryPage(maroon: widget.maroon)),
-      _wrapWithBottomPadding(
-        ProfilePage(username: widget.username, maroon: widget.maroon),
-      ),
+      _wrapWithBottomPadding(HomeView(username: username, maroon: maroon)),
+      _wrapWithBottomPadding(ProgramView(maroon: maroon)),
+      _wrapWithBottomPadding(JadwalView(maroon: maroon)),
+      _wrapWithBottomPadding(GalleryView(maroon: maroon)),
+      _wrapWithBottomPadding(ProfileView(username: username, maroon: maroon)),
     ];
 
     return Scaffold(
       extendBody: true,
-      body: pages[_index],
+      body: Obx(
+        () =>
+            IndexedStack(index: controller.currentIndex.value, children: pages),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _buildFloatingNavBar(),
+      floatingActionButton: Obx(() => _buildFloatingNavBar()),
     );
   }
+
   Widget _wrapWithBottomPadding(Widget page) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 90),
-      child: page,
-    );
+    return Padding(padding: const EdgeInsets.only(bottom: 90), child: page);
   }
 
   Widget _buildFloatingNavBar() {
-    final icons = [
-      Icons.home,
-      Icons.assignment,
-      Icons.calendar_month,
-      Icons.photo_album,
-      Icons.person,
-    ];
-
-    final labels = ["Home", "Program", "Jadwal", "Gallery", "Profil"];
-
     return SafeArea(
       minimum: const EdgeInsets.only(bottom: 10),
       child: Padding(
@@ -68,9 +50,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
-          height: 62, // 🔹 agak dibesarin
+          height: 62,
           decoration: BoxDecoration(
-            color: widget.maroon,
+            color: maroon,
             borderRadius: BorderRadius.circular(40),
             boxShadow: [
               BoxShadow(
@@ -82,11 +64,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(icons.length, (i) {
-              final isActive = _index == i;
-
+            children: List.generate(controller.iconNames.length, (i) {
+              final isActive = controller.currentIndex.value == i;
+              final IconData iconData = controller.getIconFromName(
+                controller.iconNames[i],
+              );
               return GestureDetector(
-                onTap: () => setState(() => _index = i),
+                onTap: () => controller.changeTab(i),
+                onDoubleTap: () => controller.onDoubleTapTab(i),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
@@ -108,9 +93,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                         duration: const Duration(milliseconds: 100),
                         curve: Curves.easeOutBack,
                         child: Icon(
-                          icons[i],
+                          iconData,
                           color: Colors.white,
-                          size: isActive ? 30 : 26, // 🔹 dibesarin dikit
+                          size: isActive ? 30 : 26,
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -118,14 +103,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                         duration: const Duration(milliseconds: 250),
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: isActive
-                              ? 13
-                              : 11, 
+                          fontSize: isActive ? 13 : 11,
                           fontWeight: isActive
                               ? FontWeight.bold
                               : FontWeight.normal,
                         ),
-                        child: Text(labels[i]),
+                        child: Text(controller.labels[i]),
                       ),
                     ],
                   ),

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/program_controller.dart';
-import '../models/program_model.dart';
+import '../../../models/program_model.dart';
 
-class ProgramPage extends StatelessWidget {
+class ProgramView extends GetView<ProgramController> {
   final Color maroon;
-  ProgramPage({super.key, required this.maroon});
+  ProgramView({super.key, required this.maroon});
 
-  final ProgramController controller = Get.put(ProgramController());
+
   final RxString _selectedFilter = "Semua".obs;
 
   Widget _buildFilterButton(

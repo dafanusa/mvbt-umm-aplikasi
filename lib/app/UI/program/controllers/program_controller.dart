@@ -1,21 +1,17 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import '../models/program_model.dart';
-import '../services/api_http_service.dart';
-import '../services/api_dio_service.dart';
+import '../../../models/program_model.dart';
+import '../../../../services/api_http_service.dart';
+import '../../../../services/api_dio_service.dart';
 
 class ProgramController extends GetxController {
-  // Data Program
+
   var httpProgramsAsync = <ProgramModel>[].obs;
   var dioProgramsAsync = <ProgramModel>[].obs;
   var httpProgramsCallback = <ProgramModel>[].obs;
-
-  // Loading States
   var isLoadingHttp = false.obs;
   var isLoadingDio = false.obs;
   var isLoadingCallback = false.obs;
-
-  // Status & Log
   var statusCode = "".obs;
   var statusMessage = "".obs;
   var responseLog = "".obs;
@@ -23,8 +19,7 @@ class ProgramController extends GetxController {
   final ApiHttpService _httpService = ApiHttpService();
   final ApiDioService _dioService = ApiDioService();
 
-  // Mode API aktif
-  final RxString apiMode = "http".obs; // http | dio | callback
+  final RxString apiMode = "http".obs; 
 
   void changeApiMode(String mode) {
     apiMode.value = mode;
@@ -33,7 +28,6 @@ class ProgramController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Optional: otomatis load berdasarkan mode awal
     fetchPrograms();
   }
 
@@ -62,11 +56,6 @@ class ProgramController extends GetxController {
 
       if (result['statusCode'] == 200) {
         statusMessage.value = "✅ HTTP Success";
-        Get.snackbar(
-          "Success (HTTP Async)",
-          "Memuat ${httpProgramsAsync.length} program via HTTP.",
-          duration: const Duration(seconds: 1),
-        );
       } else {
         statusMessage.value = "❌ HTTP Error (${result['statusCode']})";
         Get.snackbar(
@@ -111,11 +100,6 @@ class ProgramController extends GetxController {
 
       if (result['statusCode'] == 200) {
         statusMessage.value = "✅ Dio Success";
-        Get.snackbar(
-          "Success (Dio Async)",
-          "Memuat ${dioProgramsAsync.length} program via Dio.",
-          duration: const Duration(seconds: 1),
-        );
       } else {
         statusMessage.value = "❌ Dio Error (${result['statusCode']})";
         Get.snackbar(
@@ -159,11 +143,6 @@ class ProgramController extends GetxController {
 
       if (result['statusCode'] == 200) {
         statusMessage.value = "✅ Callback Success";
-        Get.snackbar(
-          "Success (Callback)",
-          "Memuat ${httpProgramsCallback.length} program via Callback.",
-          duration: const Duration(seconds: 1),
-        );
       } else {
         statusMessage.value = "❌ Callback Error (${result['statusCode']})";
         Get.snackbar(

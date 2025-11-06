@@ -1,31 +1,11 @@
 import 'package:flutter/material.dart';
-import 'main_navigation.dart';
-import 'register_page.dart';
+import 'package:get/get.dart';
+import '../controllers/login_controller.dart';
+import '../../register/views/register_view.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginView extends GetView<LoginController> {
   final Color maroon;
-  const LoginPage({super.key, required this.maroon});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  void _login() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => MainNavigationPage(
-          username: _emailController.text.isEmpty
-              ? 'Player'
-              : _emailController.text.split('@').first,
-          maroon: widget.maroon,
-        ),
-      ),
-    );
-  }
+  const LoginView({super.key, required this.maroon});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
               decoration: BoxDecoration(
-                color: widget.maroon,
+                color: maroon,
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(40),
                 ),
@@ -85,23 +65,23 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 32),
                   TextField(
-                    controller: _emailController,
+                    controller: controller.emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: widget.maroon),
+                        borderSide: BorderSide(color: maroon),
                       ),
                       border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
-                    controller: _passwordController,
+                    controller: controller.passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: widget.maroon),
+                        borderSide: BorderSide(color: maroon),
                       ),
                       border: const OutlineInputBorder(),
                     ),
@@ -112,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       'Lupa Password?',
                       style: TextStyle(
-                        color: widget.maroon,
+                        color: maroon,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -120,14 +100,14 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: widget.maroon,
+                      backgroundColor: maroon,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       minimumSize: const Size(double.infinity, 50),
                       elevation: 4,
                     ),
-                    onPressed: _login,
+                    onPressed: controller.login,
                     child: const Text(
                       'Sign in',
                       style: TextStyle(fontSize: 16, color: Colors.white),
@@ -135,12 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => RegisterPage(maroon: widget.maroon),
-                      ),
-                    ),
+                    onTap: () => Get.to(() => RegisterView(maroon: maroon)),
                     child: RichText(
                       text: TextSpan(
                         style: const TextStyle(color: Colors.black),
@@ -149,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextSpan(
                             text: 'Daftar',
                             style: TextStyle(
-                              color: widget.maroon,
+                              color: maroon,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

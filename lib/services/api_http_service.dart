@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import '../models/program_model.dart';
+import '../app/models/program_model.dart';
 
 class ApiHttpService {
   static const String endpointPrograms =

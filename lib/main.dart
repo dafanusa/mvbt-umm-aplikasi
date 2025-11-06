@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'pages/login_page.dart';
+import 'package:get/get.dart';
+import 'app/UI/login/views/login_view.dart';
+import 'app/routes/app_pages.dart';
+
 
 void main() {
-  runApp(VolleyballActivityManagerApp());
+  runApp(const VolleyballActivityManagerApp());
 }
 
 class VolleyballActivityManagerApp extends StatelessWidget {
@@ -12,7 +15,7 @@ class VolleyballActivityManagerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MVBT Activity Manager',
       theme: ThemeData(
@@ -20,7 +23,8 @@ class VolleyballActivityManagerApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSwatch().copyWith(secondary: maroon),
         fontFamily: 'Poppins',
       ),
-      home: LoginPage(maroon: maroon),
+      initialRoute: Routes.login, 
+      getPages: AppPages.routes,  
     );
   }
 }

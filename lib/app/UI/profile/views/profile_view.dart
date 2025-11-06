@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
+import 'package:get/get.dart';
+import 'package:mvbtummaplikasi/app/routes/app_pages.dart';
+import '../../login/views/login_view.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfileView extends StatelessWidget {
   final String username;
   final Color maroon;
-  const ProfilePage({super.key, required this.username, required this.maroon});
+  const ProfileView({super.key, required this.username, required this.maroon});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,7 @@ class ProfilePage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center, // ⬅️ TENGAH
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _statCard(Icons.event, '24', 'Kegiatan', maroon),
                         const SizedBox(width: 20),
@@ -117,13 +119,7 @@ class ProfilePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => LoginPage(maroon: maroon),
-                    ),
-                    (route) => false,
-                  );
+                  Get.offAllNamed(Routes.login);
                 },
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text(

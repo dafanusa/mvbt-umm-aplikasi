@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import '../models/program_model.dart';
+import '../app/models/program_model.dart';
 
 class ApiDioService {
   static const String baseUrl = "https://api-mvbtaplikasi-nodejs.vercel.app";
