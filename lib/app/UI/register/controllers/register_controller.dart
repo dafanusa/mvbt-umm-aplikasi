@@ -1,61 +1,49 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../login/views/login_view.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegisterController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+
   var isLoading = false.obs;
 
-  bool validateForm() {
-    if (emailController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
-      Get.snackbar(
-        'Peringatan',
-        'Semua field wajib diisi!',
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
-      return false;
+  final supabase = Supabase.instance.client;
+
+  Future<void> register(Color maroon) async {
+    final email = emailController.text.trim();
+    final pass = passwordController.text.trim();
+    final confirm = confirmPasswordController.text.trim();
+
+    if (email.isEmpty || pass.isEmpty || confirm.isEmpty) {
+      Get.snackbar("Error", "Semua field wajib diisi!");
+      return;
     }
 
-    if (passwordController.text != confirmPasswordController.text) {
-      Get.snackbar(
-        'Peringatan',
-        'Password dan konfirmasi password tidak cocok!',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
-      return false;
+    if (pass != confirm) {
+      Get.snackbar("Error", "Password dan konfirmasi tidak cocok!");
+      return;
     }
 
-    return true;
-  }
+    try {
+      isLoading.value = true;
 
-  void register(Color maroon) async {
-    if (!validateForm()) return;
-    isLoading.value = true;
+      /// REGISTER ke SUPABASE AUTH (TANPA tabel users)
+      await supabase.auth.signUp(
+        email: email,
+        password: pass,
+      );
 
-    await Future.delayed(const Duration(seconds: 1)); // simulasi
-    isLoading.value = false;
+      Get.snackbar("Sukses", "Akun berhasil dibuat!");
+      Get.back(); // Kembali ke login
 
-    Get.snackbar(
-      'Berhasil',
-      'Akun berhasil dibuat! Silakan login.',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
-
-    Get.offAll(() => LoginView(maroon: maroon));
-  }
-
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    super.onClose();
+    } on AuthException catch (e) {
+      Get.snackbar("Auth Error", e.message);
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

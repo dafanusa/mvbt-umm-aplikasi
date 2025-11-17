@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
+import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<AuthController> {
   final emailC = TextEditingController();
@@ -14,11 +14,17 @@ class LoginView extends GetView<AuthController> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            TextField(controller: emailC, decoration: InputDecoration(labelText: "Email")),
-            TextField(controller: passC, obscureText: true, decoration: InputDecoration(labelText: "Password")),
+            TextField(
+                controller: emailC,
+                decoration: InputDecoration(labelText: "Email")),
+            TextField(
+                controller: passC,
+                obscureText: true,
+                decoration: InputDecoration(labelText: "Password")),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => controller.login(emailC.text, passC.text),
+              onPressed: () =>
+                  controller.login(emailC.text.trim(), passC.text.trim()),
               child: Text("Login"),
             ),
             TextButton(

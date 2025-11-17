@@ -1,9 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class AuthService {
+class RegisterService {
   final supabase = Supabase.instance.client;
 
-  // REGISTER
   Future<String?> register({
     required String email,
     required String password,
@@ -11,19 +10,22 @@ class AuthService {
     required String role,
   }) async {
     try {
+      // 1. Membuat user auth
       final res = await supabase.auth.signUp(
         email: email,
         password: password,
       );
 
-      if (res.user == null) return "Registrasi gagal";
+      final user = res.user;
+      if (user == null) {
+        return "Gagal membuat akun auth";
+      }
 
-      // simpan info user ke tabel 'users'
-      await supabase.from('users').insert({
-        'id': res.user!.id,
-        'email': email,
-        'name': name,
-        'role': role,
+      // 2. Simpan ke tabel public.users
+      await supabase.from("users").insert({
+        "id": user.id,
+        "name": name,
+        "role": role,
       });
 
       return null;
@@ -32,7 +34,6 @@ class AuthService {
     }
   }
 
-  // LOGIN
   Future<String?> login(String email, String password) async {
     try {
       await supabase.auth.signInWithPassword(
@@ -45,21 +46,17 @@ class AuthService {
     }
   }
 
-  // GET ROLE + DATA USER
   Future<Map<String, dynamic>?> getCurrentUserData() async {
     final user = supabase.auth.currentUser;
     if (user == null) return null;
 
-    final data = await supabase
-        .from('users')
+    return await supabase
+        .from("users")
         .select()
-        .eq('id', user.id)
+        .eq("id", user.id)
         .maybeSingle();
-
-    return data;
   }
 
-  // LOGOUT
   Future<void> logout() async {
     await supabase.auth.signOut();
   }
