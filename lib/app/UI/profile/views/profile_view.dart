@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mvbtummaplikasi/app/routes/app_pages.dart';
-import '../../login/views/login_view.dart';
+import 'package:mvbtummaplikasi/app/core/values/app_colors.dart';
 
 class ProfileView extends StatelessWidget {
   final String username;
-  final Color maroon;
-  const ProfileView({super.key, required this.username, required this.maroon});
+
+  const ProfileView({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: theme.colorScheme.background,
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // ================= HEADER =================
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(top: 50, bottom: 24),
               decoration: BoxDecoration(
-                color: maroon,
+                color: AppColors.primary, // tetap merah
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(30),
                 ),
@@ -29,12 +32,12 @@ class ProfileView extends StatelessWidget {
                   CircleAvatar(
                     radius: 38,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 48, color: maroon),
+                    child: Icon(Icons.person, size: 48, color: AppColors.primary),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Soekarno Hatta',
-                    style: TextStyle(
+                  Text(
+                    username.isEmpty ? "Nama Pengguna" : username,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -45,71 +48,34 @@ class ProfileView extends StatelessWidget {
                     '202310370311200',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      'Ketua Umum',
-                      style: TextStyle(
-                        color: maroon,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _statCard(Icons.event, '24', 'Kegiatan', maroon),
-                        const SizedBox(width: 20),
-                        _statCard(Icons.emoji_events, '4', 'Prestasi', maroon),
-                        const SizedBox(width: 20),
-                        _statCard(
-                          Icons.calendar_today,
-                          '30 Sept 1965',
-                          'Bergabung',
-                          maroon,
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
 
             const SizedBox(height: 24),
 
+            // ================= INFORMASI PRIBADI =================
             _infoSection(
               context,
-              title: 'Informasi Pribadi',
+              title: "Informasi Pribadi",
               icon: Icons.person_outline,
-              maroon: maroon,
               children: const [
-                _infoItem(Icons.badge, 'Nama Lengkap', 'Soekarno Hatta'),
-                _infoItem(Icons.credit_card, 'NIM', '202310370311200'),
-                _infoItem(Icons.email, 'Email', 'soekarno.hatta@gmail.com'),
+                _infoItem(Icons.badge, "Nama Lengkap", "Soekarno Hatta"),
+                _infoItem(Icons.credit_card, "NIM", "202310370311200"),
+                _infoItem(Icons.email, "Email", "soekarno.hatta@gmail.com"),
               ],
             ),
 
             const SizedBox(height: 16),
+
+            // ================= ORGANISASI =================
             _infoSection(
               context,
-              title: 'Detail Organisasi',
+              title: "Detail Organisasi",
               icon: Icons.apartment,
-              maroon: maroon,
               children: const [
-                _infoItem(Icons.work, 'Jabatan', 'Ketua Umum'),
-                _infoItem(Icons.verified_user, 'Status Keanggotaan', 'Aktif'),
+                _infoItem(Icons.work, "Jabatan", "Ketua Umum"),
+                _infoItem(Icons.verified_user, "Status", "Aktif"),
               ],
             ),
 
@@ -119,71 +85,41 @@ class ProfileView extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Get.offAllNamed(Routes.login);
+                  Get.back();
                 },
-                icon: const Icon(Icons.logout, color: Colors.white),
-                label: const Text(
-                  'Keluar',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
+                icon: const Icon(Icons.logout),
+                label: const Text("Keluar"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: maroon,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 4,
                 ),
               ),
             ),
-
-            const SizedBox(height: 30),
+            const SizedBox(height: 30)
           ],
         ),
       ),
     );
   }
 
-  Widget _statCard(IconData icon, String value, String label, Color maroon) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white24,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: Colors.white, size: 28),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
-        ),
-      ],
-    );
-  }
-
+  // SECTION BOX
   Widget _infoSection(
     BuildContext context, {
     required String title,
     required IconData icon,
     required List<Widget> children,
-    required Color maroon,
   }) {
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -191,18 +127,18 @@ class ProfileView extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: maroon),
+              Icon(icon, color: AppColors.primary),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: maroon,
+                  color: AppColors.primary,
                   fontSize: 16,
                 ),
               ),
               const Spacer(),
-              Icon(Icons.edit, size: 18, color: maroon),
+              Icon(Icons.edit, size: 18, color: AppColors.primary),
             ],
           ),
           const SizedBox(height: 12),
@@ -222,12 +158,14 @@ class _infoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.black54),
+          Icon(icon, color: theme.colorScheme.onSurface.withOpacity(0.6)),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -235,13 +173,17 @@ class _infoItem extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
                     fontSize: 14,
                   ),
                 ),

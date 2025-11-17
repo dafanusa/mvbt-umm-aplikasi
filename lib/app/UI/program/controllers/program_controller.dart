@@ -1,175 +1,95 @@
-import 'dart:async';
 import 'package:get/get.dart';
 import '../../../models/program_model.dart';
-import '../../../../services/api_http_service.dart';
-import '../../../../services/api_dio_service.dart';
+import '../../../../services/program_supabase_service.dart';
+import '../../login/controllers/login_controller.dart';
 
 class ProgramController extends GetxController {
+  final ProgramSupabaseService supabaseService = ProgramSupabaseService();
+  final LoginController loginC = Get.find<LoginController>();
 
-  var httpProgramsAsync = <ProgramModel>[].obs;
-  var dioProgramsAsync = <ProgramModel>[].obs;
-  var httpProgramsCallback = <ProgramModel>[].obs;
-  var isLoadingHttp = false.obs;
-  var isLoadingDio = false.obs;
-  var isLoadingCallback = false.obs;
-  var statusCode = "".obs;
-  var statusMessage = "".obs;
-  var responseLog = "".obs;
+  // DATA PROGRAM
+  RxList<ProgramModel> programs = <ProgramModel>[].obs;
 
-  final ApiHttpService _httpService = ApiHttpService();
-  final ApiDioService _dioService = ApiDioService();
-
-  final RxString apiMode = "http".obs; 
-
-  void changeApiMode(String mode) {
-    apiMode.value = mode;
-  }
+  // LOADING
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchPrograms();
+    getPrograms(); // langsung ambil dari SUPABASE
   }
 
-  /// PANGGILAN UTAMA
-  Future<void> fetchPrograms() async {
-    if (apiMode.value == "http") {
-      await fetchProgramsHttpAsync();
-    } else if (apiMode.value == "dio") {
-      await fetchProgramsDioAsync();
-    } else if (apiMode.value == "callback") {
-      await fetchProgramsHttpCallbackChaining();
+  // =====================================================
+  // AMBIL DATA DARI SUPABASE
+  // =====================================================
+  Future<void> getPrograms() async {
+    try {
+      isLoading.value = true;
+      final result = await supabaseService.getPrograms();
+      programs.assignAll(result);
+    } catch (e) {
+      Get.snackbar("Error", "Gagal memuat program: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  /// HTTP ASYNC
-  Future<void> fetchProgramsHttpAsync() async {
-    isLoadingHttp.value = true;
-    try {
-      final result = await _httpService.fetchProgramsWithStatus().timeout(
-        const Duration(seconds: 5),
-      );
+  // =====================================================
+  // TAMBAH PROGRAM → SUPABASE
+  // =====================================================
+  Future<void> addProgram(ProgramModel p) async {
+    if (loginC.userRole.value != "admin") {
+      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh menambah program");
+      return;
+    }
 
-      httpProgramsAsync.value = result['data'];
-      statusCode.value = result['statusCode'].toString();
-      responseLog.value = result['raw'] ?? "";
+    final ok = await supabaseService.addProgram(p);
 
-      if (result['statusCode'] == 200) {
-        statusMessage.value = "✅ HTTP Success";
-      } else {
-        statusMessage.value = "❌ HTTP Error (${result['statusCode']})";
-        Get.snackbar(
-          "HTTP Error",
-          "Status: ${result['statusCode']}",
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } on TimeoutException {
-      statusMessage.value = "❌ HTTP Timeout";
-      responseLog.value =
-          "❌ HTTP Timeout: Server tidak merespon dalam 5 detik.";
-      Get.snackbar(
-        "Timeout (HTTP)",
-        "Server tidak merespon dalam 5 detik.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      statusMessage.value = "❌ HTTP Exception: $e";
-      responseLog.value = "❌ HTTP Exception: $e";
-      Get.snackbar(
-        "Error HTTP (Async)",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoadingHttp.value = false;
+    if (ok) {
+      await getPrograms(); // WAJIB! Refresh data UI
+      Get.back();
+      Get.snackbar("Success", "Program berhasil ditambahkan");
+    } else {
+      Get.snackbar("Error", "Gagal menambah program");
     }
   }
 
-  /// DIO ASYNC
-  Future<void> fetchProgramsDioAsync() async {
-    isLoadingDio.value = true;
-    try {
-      final result = await _dioService.fetchProgramsWithStatus().timeout(
-        const Duration(seconds: 5),
-      );
+  // =====================================================
+  // UPDATE PROGRAM → SUPABASE
+  // =====================================================
+  Future<void> updateProgram(ProgramModel p) async {
+    if (loginC.userRole.value != "admin") {
+      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh mengedit program");
+      return;
+    }
 
-      dioProgramsAsync.value = result['data'];
-      statusCode.value = result['statusCode'].toString();
-      responseLog.value = result['raw'] ?? "";
+    final ok = await supabaseService.updateProgram(p);
 
-      if (result['statusCode'] == 200) {
-        statusMessage.value = "✅ Dio Success";
-      } else {
-        statusMessage.value = "❌ Dio Error (${result['statusCode']})";
-        Get.snackbar(
-          "Dio Error",
-          "Status: ${result['statusCode']}",
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } on TimeoutException {
-      statusMessage.value = "❌ Dio Timeout";
-      responseLog.value = "❌ Dio Timeout: Server tidak merespon dalam 5 detik.";
-      Get.snackbar(
-        "Timeout (Dio)",
-        "Server tidak merespon dalam 5 detik.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      statusMessage.value = "❌ Dio Exception: $e";
-      responseLog.value = "❌ Dio Exception: $e";
-      Get.snackbar(
-        "Error Dio (Async)",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoadingDio.value = false;
+    if (ok) {
+      await getPrograms(); // refresh setelah update
+      Get.back();
+      Get.snackbar("Success", "Program diperbarui");
+    } else {
+      Get.snackbar("Error", "Gagal memperbarui program");
     }
   }
 
-  /// CALLBACK CHAINING
-  Future<void> fetchProgramsHttpCallbackChaining() async {
-    isLoadingCallback.value = true;
-    try {
-      final result = await _httpService
-          .fetchProgramsCallbackWithStatus()
-          .timeout(const Duration(seconds: 5));
+  // =====================================================
+  // DELETE PROGRAM → SUPABASE
+  // =====================================================
+  Future<void> deleteProgram(int id) async {
+    if (loginC.userRole.value != "admin") {
+      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh menghapus program");
+      return;
+    }
 
-      httpProgramsCallback.value = result['data'];
-      statusCode.value = result['statusCode'].toString();
-      responseLog.value = result['raw'] ?? "";
+    final ok = await supabaseService.deleteProgram(id);
 
-      if (result['statusCode'] == 200) {
-        statusMessage.value = "✅ Callback Success";
-      } else {
-        statusMessage.value = "❌ Callback Error (${result['statusCode']})";
-        Get.snackbar(
-          "Callback Error",
-          "Status: ${result['statusCode']}",
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } on TimeoutException {
-      statusMessage.value = "❌ Callback Timeout";
-      responseLog.value =
-          "❌ Callback Timeout: Server tidak merespon dalam 5 detik.";
-      Get.snackbar(
-        "Timeout (Callback)",
-        "Server tidak merespon dalam 5 detik.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      statusMessage.value = "❌ Callback Exception: $e";
-      responseLog.value = "❌ Callback Exception: $e";
-      Get.snackbar(
-        "Error HTTP (Callback)",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoadingCallback.value = false;
+    if (ok) {
+      await getPrograms(); // refresh setelah hapus
+      Get.snackbar("Success", "Program dihapus");
+    } else {
+      Get.snackbar("Error", "Gagal menghapus program");
     }
   }
 }

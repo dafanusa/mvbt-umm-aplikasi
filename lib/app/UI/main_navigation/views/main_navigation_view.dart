@@ -24,7 +24,7 @@ class MainNavigationView extends GetView<MainNavigationController> {
       _wrapWithBottomPadding(ProgramView(maroon: maroon)),
       _wrapWithBottomPadding(JadwalView(maroon: maroon)),
       _wrapWithBottomPadding(GalleryView(maroon: maroon)),
-      _wrapWithBottomPadding(ProfileView(username: username, maroon: maroon)),
+      _wrapWithBottomPadding(ProfileView(username: username)),
     ];
 
     return Scaffold(

@@ -5,7 +5,11 @@ class ProgramCard extends StatelessWidget {
   final ProgramModel item;
   final Color maroon;
 
-  const ProgramCard({super.key, required this.item, required this.maroon});
+  const ProgramCard({
+    super.key,
+    required this.item,
+    required this.maroon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,14 +19,18 @@ class ProgramCard extends StatelessWidget {
     final double titleSize = isWide
         ? 18
         : screenWidth < 400
-        ? 14
-        : 16;
+            ? 14
+            : 16;
+
     final double descSize = isWide ? 14 : 12.5;
+
     final double paddingScale = isWide
         ? 18
         : screenWidth < 400
-        ? 12
-        : 14;
+            ? 12
+            : 14;
+
+    // warna status
     Color statusColor;
     switch (item.status) {
       case "Sedang Berlangsung":
@@ -41,7 +49,7 @@ class ProgramCard extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: isWide ? 900 : double.infinity, // 🔹 Full di laptop
+          maxWidth: isWide ? 900 : double.infinity,
         ),
         child: Card(
           elevation: 3,
@@ -56,6 +64,7 @@ class ProgramCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // TITLE
                   Text(
                     item.title,
                     style: TextStyle(
@@ -67,6 +76,7 @@ class ProgramCard extends StatelessWidget {
 
                   const SizedBox(height: 6),
 
+                  // DESCRIPTION
                   Text(
                     item.description,
                     style: TextStyle(
@@ -77,42 +87,28 @@ class ProgramCard extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          "📅 ${item.date}",
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+
+                  // STATUS ONLY (TANPA TANGGAL)
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        item.status,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-
-                      const SizedBox(width: 8),
-
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          item.status,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
