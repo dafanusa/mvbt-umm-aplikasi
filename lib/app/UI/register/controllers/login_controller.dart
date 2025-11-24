@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../routes/app_pages.dart';
 import 'package:mvbtummaplikasi/services/internet_service.dart';
 
-class RegisterController extends GetxController {
+class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
-
   final supabase = Supabase.instance.client;
   final internet = InternetService();
+
+  final maroon = const Color(0xFF800000);
 
   var isLoading = false.obs;
   var isOnline = true.obs;
@@ -18,61 +20,49 @@ class RegisterController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // Update status online
     internet.connectionStream.listen((connected) {
       isOnline.value = connected;
 
       if (!connected) {
-        Get.snackbar(
-          "Offline",
-          "No internet connection",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        Get.snackbar("Offline", "Tidak ada koneksi internet",
+            backgroundColor: Colors.red, colorText: Colors.white);
       }
     });
   }
 
-  Future<void> register(Color maroon) async {
+  Future<void> login() async {
     final email = emailController.text.trim();
-    final pass = passwordController.text.trim();
-    final confirm = confirmPasswordController.text.trim();
+    final password = passwordController.text.trim();
 
     if (!await internet.checkConnection()) {
-      Get.snackbar("Tidak ada internet", "Nyalakan internet untuk register",
+      Get.snackbar("Offline", "Internet diperlukan untuk login Supabase",
           backgroundColor: Colors.orange, colorText: Colors.white);
       return;
     }
 
-    if (email.isEmpty || pass.isEmpty || confirm.isEmpty) {
-      Get.snackbar("Error", "Semua field wajib diisi!");
-      return;
-    }
-
-    if (pass != confirm) {
-      Get.snackbar("Error", "Password dan konfirmasi tidak cocok!");
+    if (email.isEmpty || password.isEmpty) {
+      Get.snackbar("Error", "Email dan password harus diisi");
       return;
     }
 
     try {
       isLoading.value = true;
 
-      final response = await supabase.auth.signUp(
+      await supabase.auth.signInWithPassword(
         email: email,
-        password: pass,
+        password: password,
       );
 
-      if (response.user == null) {
-        Get.snackbar("Error", "Registrasi gagal");
-        return;
-      }
+      // Simpan role default (user)
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString("role", "user");
 
-      Get.snackbar("Sukses", "Akun berhasil dibuat! Silakan login.",
-          backgroundColor: Colors.green, colorText: Colors.white);
-
-      Get.back();
+      Get.offNamed(Routes.mainNavigation, arguments: {
+        'username': email.split("@").first,
+        'maroon': maroon,
+      });
     } on AuthException catch (e) {
-      Get.snackbar("Auth Error", e.message,
+      Get.snackbar("Login Error", e.message,
           backgroundColor: Colors.red, colorText: Colors.white);
     } catch (e) {
       Get.snackbar("Error", e.toString(),
