@@ -9,8 +9,6 @@ class ProgramView extends GetView<ProgramController> {
   ProgramView({super.key, required this.maroon});
 
   final LoginController loginC = Get.find<LoginController>();
-  final RxString _selectedFilter = "Semua".obs;
-
   // ============================
   // ADD PROGRAM
   // ============================
