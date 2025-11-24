@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mvbtummaplikasi/app/core/values/app_colors.dart';
+import 'package:mvbtummaplikasi/app/routes/app_pages.dart';
 
 class ProfileView extends StatelessWidget {
   final String username;
@@ -22,7 +23,7 @@ class ProfileView extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.only(top: 50, bottom: 24),
               decoration: BoxDecoration(
-                color: AppColors.primary, // tetap merah
+                color: const Color.fromARGB(255, 122, 0, 0), 
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(30),
                 ),
@@ -32,7 +33,7 @@ class ProfileView extends StatelessWidget {
                   CircleAvatar(
                     radius: 38,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 48, color: AppColors.primary),
+                    child: Icon(Icons.person, size: 48, color: const Color.fromARGB(255, 122, 0, 0)),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -85,12 +86,12 @@ class ProfileView extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Get.back();
+                  Get.offAllNamed(Routes.login);
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text("Keluar"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: const Color.fromARGB(255, 122, 0, 0),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
@@ -127,18 +128,18 @@ class ProfileView extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.primary),
+              Icon(icon, color: const Color.fromARGB(255, 122, 0, 0)),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: const Color.fromARGB(255, 122, 0, 0),
                   fontSize: 16,
                 ),
               ),
               const Spacer(),
-              Icon(Icons.edit, size: 18, color: AppColors.primary),
+              Icon(Icons.edit, size: 18, color: const Color.fromARGB(255, 122, 0, 0)),
             ],
           ),
           const SizedBox(height: 12),

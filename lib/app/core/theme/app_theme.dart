@@ -8,7 +8,7 @@ class AppTheme {
 
     scaffoldBackgroundColor: AppColors.background,
 
-    primaryColor: AppColors.primary,
+    primaryColor: const Color.fromARGB(255, 122, 0, 0),
 
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.surface,
@@ -22,7 +22,7 @@ class AppTheme {
 
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColors.surface,
-      selectedItemColor: AppColors.primary,
+      selectedItemColor: Color.fromARGB(255, 122, 0, 0),
       unselectedItemColor: AppColors.textSecondary,
       showUnselectedLabels: true,
       elevation: 8,
@@ -37,7 +37,7 @@ class AppTheme {
     // Buttons
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Color.fromARGB(255, 122, 0, 0),
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -46,8 +46,8 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       background: AppColors.background,
       surface: AppColors.surface,
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
+      primary: Color.fromARGB(255, 122, 0, 0),
+      secondary: Color.fromARGB(255, 122, 0, 0),
     ).copyWith(surfaceVariant: AppColors.surfaceVariant),
   );
 
@@ -57,7 +57,7 @@ class AppTheme {
 
     scaffoldBackgroundColor: AppColors.darkBackground,
 
-    primaryColor: AppColors.primary,
+    primaryColor: Color.fromARGB(255, 122, 0, 0),
 
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.darkSurface,
@@ -71,7 +71,7 @@ class AppTheme {
 
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColors.darkSurface,
-      selectedItemColor: AppColors.primaryLight,
+      selectedItemColor: Color.fromARGB(255, 122, 0, 0),
       unselectedItemColor: AppColors.darkTextSecondary,
       showUnselectedLabels: true,
       elevation: 8,
@@ -85,7 +85,7 @@ class AppTheme {
 
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryLight,
+        backgroundColor: Color.fromARGB(255, 122, 0, 0),
         foregroundColor: Colors.black,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -94,8 +94,8 @@ class AppTheme {
     colorScheme: const ColorScheme.dark(
       background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
+      primary: Color.fromARGB(255, 122, 0, 0),
+      secondary: Color.fromARGB(255, 122, 0, 0),
     ).copyWith(surfaceVariant: AppColors.darkSurfaceVariant),
   );
 }

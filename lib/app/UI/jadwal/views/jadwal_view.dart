@@ -10,10 +10,8 @@ import '../../../models/jadwal_model.dart';
 class JadwalView extends GetView<JadwalController> {
   final Color maroon;
 
-  const JadwalView({
-    Key? key,
-    this.maroon = const Color(0xFF800000),
-  }) : super(key: key);
+  const JadwalView({Key? key, this.maroon = const Color(0xFF800000)})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +24,7 @@ class JadwalView extends GetView<JadwalController> {
       floatingActionButton: Obx(() {
         return loginC.userRole.value == "admin"
             ? FloatingActionButton(
-                backgroundColor: AppColors.primary,
+                backgroundColor: const Color.fromARGB(255, 122, 0, 0),
                 child: const Icon(Icons.add, color: Colors.white),
                 onPressed: () => _showAddDialog(context),
               )
@@ -62,7 +60,7 @@ class JadwalView extends GetView<JadwalController> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(top: top + 15, bottom: 15),
-      color: AppColors.primary,
+      color: const Color.fromARGB(255, 122, 0, 0),
       alignment: Alignment.center,
       child: const Text(
         "Jadwal Kegiatan 📅",
@@ -107,7 +105,7 @@ class JadwalView extends GetView<JadwalController> {
           shape: BoxShape.circle,
         ),
         selectedDecoration: BoxDecoration(
-          color: AppColors.primary,
+          color: const Color.fromARGB(255, 0, 102, 143),
           shape: BoxShape.circle,
         ),
       ),
@@ -139,7 +137,6 @@ class JadwalView extends GetView<JadwalController> {
 
   // ============================ FILTER BUTTONS ============================
   Widget _filterButtons(BuildContext context) {
-    final theme = Theme.of(context);
     final filters = ["Semua", "Latihan", "Pertandingan"];
 
     return Row(
@@ -151,14 +148,21 @@ class JadwalView extends GetView<JadwalController> {
           label: Text(
             f,
             style: TextStyle(
-              color: selected ? Colors.white : theme.colorScheme.onSurface,
+              color: selected ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
           selected: selected,
           onSelected: (_) => controller.setFilter(f),
-          selectedColor: AppColors.primary,
-          backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
+          backgroundColor: const Color.fromARGB(255, 206, 206, 206),
+          selectedColor: const Color.fromARGB(255, 122, 0, 0),
+
+          checkmarkColor: Colors.white,
+          side: BorderSide.none,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide.none,
+          ),
         );
       }).toList(),
     );
@@ -179,9 +183,7 @@ class JadwalView extends GetView<JadwalController> {
       );
     }
 
-    return Column(
-      children: items.map((e) => _eventCard(context, e)).toList(),
-    );
+    return Column(children: items.map((e) => _eventCard(context, e)).toList());
   }
 
   // ============================ EVENT CARD ============================
@@ -211,7 +213,9 @@ class JadwalView extends GetView<JadwalController> {
               Text(
                 e.title,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 controller.formatDate(e.date),
@@ -220,7 +224,9 @@ class JadwalView extends GetView<JadwalController> {
               Text(
                 e.time,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -307,9 +313,10 @@ class JadwalView extends GetView<JadwalController> {
           Obx(() {
             return DropdownButton<String>(
               value: category.value,
-              items: ["Latihan", "Pertandingan"]
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
+              items: [
+                "Latihan",
+                "Pertandingan",
+              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               onChanged: (v) => category.value = v!,
             );
           }),
@@ -318,7 +325,7 @@ class JadwalView extends GetView<JadwalController> {
 
       textConfirm: "Simpan",
       confirmTextColor: Colors.white,
-      buttonColor: AppColors.primary,
+      buttonColor: const Color.fromARGB(255, 122, 0, 0),
 
       textCancel: "Batal",
       cancelTextColor: theme.colorScheme.onSurface,
