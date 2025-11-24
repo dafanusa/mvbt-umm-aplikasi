@@ -1,5 +1,3 @@
-app colors
-
 import 'package:flutter/material.dart';
 
 class AppColors {

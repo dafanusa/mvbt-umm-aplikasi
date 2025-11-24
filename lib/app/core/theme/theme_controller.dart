@@ -1,5 +1,3 @@
-theme controller
-
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../data/providers/theme_provider.dart';
