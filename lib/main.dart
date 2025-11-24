@@ -1,30 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'app/UI/login/views/login_view.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'app/UI/login/controllers/login_controller.dart';
 import 'app/routes/app_pages.dart';
+import 'app/core/theme/app_theme.dart';
+import 'app/core/theme/theme_controller.dart';
+import 'app/models/jadwal_model.dart';
+import 'app/UI/jadwal/controllers/jadwal_controller.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  // 🟢 Init Hive
+  await Hive.initFlutter();
+  Hive.registerAdapter(JadwalModelAdapter()); // WAJIB untuk Hive Model
+
+  // 🟢 Init Supabase
+  await Supabase.initialize(
+    url: "https://pgrmuxoxruzkvgsqderg.supabase.co",
+    anonKey:
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBncm11eG94cnV6a3Znc3FkZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzMDUwMDgsImV4cCI6MjA3ODg4MTAwOH0.KiyCVlDVyBJat_ROdZCWrDIV5RnwRiwz7c8eF4Y7ih4",
+  );
+
+  // 🔵 Register global controllers
+  Get.put(LoginController(), permanent: true);
+  Get.put(ThemeController(), permanent: true);
+  Get.put(JadwalController(), permanent: true);
+
   runApp(const VolleyballActivityManagerApp());
 }
 
 class VolleyballActivityManagerApp extends StatelessWidget {
-  final Color maroon = const Color(0xFF800000);
-
   const VolleyballActivityManagerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'MVBT Activity Manager',
-      theme: ThemeData(
-        primaryColor: maroon,
-        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: maroon),
-        fontFamily: 'Poppins',
-      ),
-      initialRoute: Routes.login, 
-      getPages: AppPages.routes,  
-    );
+    // ⛔ PENTING! ThemeController harus dipanggil di sini
+    final themeC = Get.find<ThemeController>();
+
+    return Obx(() {
+      return GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'MVBT Activity Manager',
+
+        // 🎨 Tema lengkap
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeC.isDark.value ? ThemeMode.dark : ThemeMode.light,
+
+        // 🔥 Routing
+        initialRoute: Routes.login,
+        getPages: AppPages.routes,
+      );
+    });
   }
 }
