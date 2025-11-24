@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../app/models/program_model.dart';
-import '../services/api_services.dart';
 
-class ApiDioService implements ApiService {
+class ApiDioService {
   static const String baseUrl = "https://api-mvbtaplikasi-nodejs.vercel.app";
   static const String endpointPrograms = "/programs";
 
@@ -11,76 +10,66 @@ class ApiDioService implements ApiService {
 
   ApiDioService() {
     _dio.options.baseUrl = baseUrl;
-    _dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestBody: true,
-        responseBody: true,
-        error: true,
-      ),
-    );
+    _dio.interceptors.add(LogInterceptor(
+      request: true,
+      requestBody: true,
+      responseBody: true,
+      error: true,
+      logPrint: (obj) => print("📘 [DIO LOG] $obj"),
+    ));
   }
 
-  // ============================================================
-  // GET — DIO
-  // ============================================================
-  @override
   Future<Map<String, dynamic>> fetchProgramsWithStatus() async {
+    final stopwatch = Stopwatch()..start();
+
     try {
       final response = await _dio.get(endpointPrograms);
+      stopwatch.stop();
+
+      final log = StringBuffer()
+        ..writeln("🔹 [DIO LOG]")
+        ..writeln("Base URL: $baseUrl")
+        ..writeln("Endpoint: $endpointPrograms")
+        ..writeln("Method: GET")
+        ..writeln("Status Code: ${response.statusCode}")
+        ..writeln("Duration: ${stopwatch.elapsedMilliseconds} ms");
 
       if (response.statusCode == 200 && response.data is List) {
-        final List list = response.data;
+        final List data = response.data;
         return {
-          'statusCode': 200,
-          'data': list.map((e) => ProgramModel.fromJson(e)).toList(),
+          'statusCode': response.statusCode,
+          'data': data.map((e) => ProgramModel.fromJson(e)).toList(),
+          'raw': log.toString(),
+        };
+      } else {
+        return {
+          'statusCode': response.statusCode ?? 500,
+          'data': <ProgramModel>[],
+          'raw': "❌ DIO Error (Status: ${response.statusCode})\n${log.toString()}",
         };
       }
+    } on DioException catch (e) {
+      stopwatch.stop();
+      final code = e.response?.statusCode ?? 500;
+      final msg = e.message ?? 'Unknown Dio Error';
+
+      final log = StringBuffer()
+        ..writeln("❌ [DIO EXCEPTION]")
+        ..writeln("Error: $msg")
+        ..writeln("Duration: ${stopwatch.elapsedMilliseconds} ms");
 
       return {
-        'statusCode': response.statusCode ?? 500,
+        'statusCode': code,
         'data': <ProgramModel>[],
+        'raw': log.toString(),
       };
     } catch (e) {
+      stopwatch.stop();
       return {
         'statusCode': 500,
         'data': <ProgramModel>[],
+        'raw': "❌ DIO Unknown Error: $e\nDurasi: ${stopwatch.elapsedMilliseconds} ms",
       };
     }
-  }
-
-  // ============================================================
-  // POST — DIO
-  // ============================================================
-  @override
-  Future<bool> addProgram(ProgramModel program) async {
-    final response = await _dio.post(
-      endpointPrograms,
-      data: program.toJson(),
-    );
-
-    return response.statusCode == 200 || response.statusCode == 201;
-  }
-
-  // ============================================================
-  // PUT — DIO
-  // ============================================================
-  @override
-  Future<bool> updateProgram(ProgramModel program) async {
-    final response = await _dio.put(
-      "$endpointPrograms/${program.id}",
-      data: program.toJson(),
-    );
-
-    return response.statusCode == 200;
-  }
-
-  // ============================================================
-  // DELETE — DIO
-  // ============================================================
-  @override
-  Future<bool> deleteProgram(int id) async {
-    final response = await _dio.delete("$endpointPrograms/$id");
-    return response.statusCode == 200;
   }
 }

@@ -2,52 +2,66 @@ class ProgramModel {
   final int id;
   final String title;
   final String description;
-  final String date; 
+  final String date;
   final String status;
+  final bool isActive;
 
   ProgramModel({
     required this.id,
     required this.title,
     required this.description,
     required this.date,
+    required this.isActive,
     required this.status,
   });
 
-  // ================================
-  // FROM JSON (Supabase & API)
-  // ================================
   factory ProgramModel.fromJson(Map<String, dynamic> json) {
+    // Menentukan status otomatis berdasarkan isActive dan tanggal
+    String computedStatus;
+    if (json['is_active'] == true) {
+      computedStatus = "Sedang Berlangsung";
+    } else {
+      computedStatus = _determineStatusFromDate(json['date']);
+    }
+
     return ProgramModel(
-      id: json["id"] is int ? json["id"] : int.tryParse(json["id"].toString()) ?? 0,
-      title: json["title"] ?? "",
-      description: json["description"] ?? "",
-      date: json["date"] ?? "",
-      status: json["status"] ?? "",
+      id: json['id'] ?? 0,
+      title: json['title'] ?? 'Tanpa Judul',
+      description: json['description'] ?? 'Tidak ada deskripsi',
+      date: json['date'] ?? 'Tanggal tidak tersedia',
+      isActive: json['is_active'] ?? false,
+      status: json['status'] ?? 'Tidak Diketahui',
     );
   }
 
-  // ================================
-  // UPDATE / SEND FULL DATA
-  // ================================
   Map<String, dynamic> toJson() {
     return {
-      "title": title,
-      "description": description,
-      "date": date,
-      "status": status,
+      'id': id,
+      'title': title,
+      'description': description,
+      'date': date,
+      'is_active': isActive,
+      'status': status,
     };
   }
 
-  // ================================
-  // CREATE (INSERT ONLY)
-  // id TIDAK BOLEH DIKIRIM
-  // ================================
-  Map<String, dynamic> toJsonCreate() {
-    return {
-      "title": title,
-      "description": description,
-      "date": date,
-      "status": status,
-    };
+  /// 🔹 Fungsi bantu untuk menentukan status berdasarkan tanggal
+  static String _determineStatusFromDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return "Tidak Diketahui";
+
+    try {
+      final eventDate = DateTime.parse(dateStr);
+      final now = DateTime.now();
+
+      if (eventDate.isAfter(now)) {
+        return "Akan Datang";
+      } else if (eventDate.isBefore(now)) {
+        return "Selesai";
+      } else {
+        return "Sedang Berlangsung";
+      }
+    } catch (e) {
+      return "Tidak Diketahui";
+    }
   }
 }

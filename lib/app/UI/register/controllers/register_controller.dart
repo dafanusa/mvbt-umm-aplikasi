@@ -1,84 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:mvbtummaplikasi/services/internet_service.dart';
+import '../../login/views/login_view.dart';
 
 class RegisterController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-
-  final supabase = Supabase.instance.client;
-  final internet = InternetService();
-
   var isLoading = false.obs;
-  var isOnline = true.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
+  bool validateForm() {
+    if (emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
+      Get.snackbar(
+        'Peringatan',
+        'Semua field wajib diisi!',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+      return false;
+    }
 
-    // Update status online
-    internet.connectionStream.listen((connected) {
-      isOnline.value = connected;
+    if (passwordController.text != confirmPasswordController.text) {
+      Get.snackbar(
+        'Peringatan',
+        'Password dan konfirmasi password tidak cocok!',
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      return false;
+    }
 
-      if (!connected) {
-        Get.snackbar(
-          "Offline",
-          "No internet connection",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-      }
-    });
+    return true;
   }
 
-  Future<void> register(Color maroon) async {
-    final email = emailController.text.trim();
-    final pass = passwordController.text.trim();
-    final confirm = confirmPasswordController.text.trim();
+  void register(Color maroon) async {
+    if (!validateForm()) return;
+    isLoading.value = true;
 
-    if (!await internet.checkConnection()) {
-      Get.snackbar("Tidak ada internet", "Nyalakan internet untuk register",
-          backgroundColor: Colors.orange, colorText: Colors.white);
-      return;
-    }
+    await Future.delayed(const Duration(seconds: 1)); // simulasi
+    isLoading.value = false;
 
-    if (email.isEmpty || pass.isEmpty || confirm.isEmpty) {
-      Get.snackbar("Error", "Semua field wajib diisi!");
-      return;
-    }
+    Get.snackbar(
+      'Berhasil',
+      'Akun berhasil dibuat! Silakan login.',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
 
-    if (pass != confirm) {
-      Get.snackbar("Error", "Password dan konfirmasi tidak cocok!");
-      return;
-    }
+    Get.offAll(() => LoginView(maroon: maroon));
+  }
 
-    try {
-      isLoading.value = true;
-
-      final response = await supabase.auth.signUp(
-        email: email,
-        password: pass,
-      );
-
-      if (response.user == null) {
-        Get.snackbar("Error", "Registrasi gagal");
-        return;
-      }
-
-      Get.snackbar("Sukses", "Akun berhasil dibuat! Silakan login.",
-          backgroundColor: Colors.green, colorText: Colors.white);
-
-      Get.back();
-    } on AuthException catch (e) {
-      Get.snackbar("Auth Error", e.message,
-          backgroundColor: Colors.red, colorText: Colors.white);
-    } catch (e) {
-      Get.snackbar("Error", e.toString(),
-          backgroundColor: Colors.red, colorText: Colors.white);
-    } finally {
-      isLoading.value = false;
-    }
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.onClose();
   }
 }

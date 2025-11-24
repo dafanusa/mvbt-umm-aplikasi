@@ -2,118 +2,90 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../app/models/program_model.dart';
-import '../services/api_services.dart';
 
-class ApiHttpService implements ApiService {
-  static const String baseUrl =
+class ApiHttpService {
+  static const String endpointPrograms =
       "https://api-mvbtaplikasi-nodejs.vercel.app/programs";
 
-  // ============================================================
-  // GET — HTTP
-  // ============================================================
-  Future<Map<String, dynamic>> fetchProgramsWithStatusHttp() async {
+  /// HTTP ASYNC
+  Future<Map<String, dynamic>> fetchProgramsWithStatus() async {
     final stopwatch = Stopwatch()..start();
-    final url = Uri.parse(baseUrl);
+    final url = Uri.parse(endpointPrograms);
 
     try {
-      final response = await http
-          .get(url, headers: {"Accept": "application/json"})
-          .timeout(const Duration(seconds: 12));
-
+      final response = await http.get(url);
       stopwatch.stop();
 
+      final log = StringBuffer()
+        ..writeln("🔹 [HTTP LOG]")
+        ..writeln("URL: $endpointPrograms")
+        ..writeln("Method: GET")
+        ..writeln("Status Code: ${response.statusCode}")
+        ..writeln("Duration: ${stopwatch.elapsedMilliseconds} ms");
+
       if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-
-        if (decoded is! List) {
-          return {
-            'statusCode': 500,
-            'data': <ProgramModel>[],
-          };
-        }
-
-        final data = decoded.map((e) => ProgramModel.fromJson(e)).toList();
-
+        final List data = json.decode(response.body);
         return {
-          'statusCode': 200,
-          'data': data,
+          'statusCode': response.statusCode,
+          'data': data.map((e) => ProgramModel.fromJson(e)).toList(),
+          'raw': log.toString(),
+        };
+      } else {
+        return {
+          'statusCode': response.statusCode,
+          'data': <ProgramModel>[],
+          'raw': "❌ HTTP Error (Status: ${response.statusCode})\n${log.toString()}",
         };
       }
-
-      return {
-        'statusCode': response.statusCode,
-        'data': <ProgramModel>[],
-      };
-    } catch (_) {
+    } catch (e) {
       stopwatch.stop();
       return {
         'statusCode': 500,
         'data': <ProgramModel>[],
+        'raw': "❌ HTTP Exception: $e\nDurasi: ${stopwatch.elapsedMilliseconds} ms",
       };
     }
   }
 
-  // ============================================================
-  // POST — HTTP
-  // ============================================================
-  Future<bool> addProgramHttp(ProgramModel program) async {
-    final url = Uri.parse(baseUrl);
+  ///  HTTP CALLBACK 
+  Future<Map<String, dynamic>> fetchProgramsCallbackWithStatus() {
+    final stopwatch = Stopwatch()..start();
+    final url = Uri.parse(endpointPrograms);
+    final completer = Completer<Map<String, dynamic>>();
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(program.toJson()),
-    );
+    http.get(url).then((response) {
+      stopwatch.stop();
 
-    return response.statusCode == 200 || response.statusCode == 201;
-  }
+      final log = StringBuffer()
+        ..writeln("🔹 [HTTP CALLBACK LOG]")
+        ..writeln("URL: $endpointPrograms")
+        ..writeln("Method: GET")
+        ..writeln("Status Code: ${response.statusCode}")
+        ..writeln("Duration: ${stopwatch.elapsedMilliseconds} ms");
 
-  // ============================================================
-  // PUT — HTTP
-  // ============================================================
-  Future<bool> updateProgramHttp(ProgramModel program) async {
-    final url = Uri.parse("$baseUrl/${program.id}");
+      if (response.statusCode == 200) {
+        final List data = json.decode(response.body);
+        completer.complete({
+          'statusCode': response.statusCode,
+          'data': data.map((e) => ProgramModel.fromJson(e)).toList(),
+          'raw': log.toString(),
+        });
+      } else {
+        completer.complete({
+          'statusCode': response.statusCode,
+          'data': <ProgramModel>[],
+          'raw': "❌ Callback Error (Status: ${response.statusCode})\n${log.toString()}",
+        });
+      }
+    }).catchError((error) {
+      stopwatch.stop();
+      completer.complete({
+        'statusCode': 500,
+        'data': <ProgramModel>[],
+        'raw': "❌ Callback Exception: $error\nDurasi: ${stopwatch.elapsedMilliseconds} ms",
+      });
+    });
 
-    final response = await http.put(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(program.toJson()),
-    );
-
-    return response.statusCode == 200;
-  }
-
-  // ============================================================
-  // DELETE — HTTP
-  // ============================================================
-  Future<bool> deleteProgramHttp(int id) async {
-    final url = Uri.parse("$baseUrl/$id");
-
-    final response = await http.delete(url);
-
-    return response.statusCode == 200;
-  }
-
-  // ============================================================
-  // IMPLEMENTASI INTERFACE
-  // ============================================================
-  @override
-  Future<Map<String, dynamic>> fetchProgramsWithStatus() {
-    return fetchProgramsWithStatusHttp();
-  }
-
-  @override
-  Future<bool> addProgram(ProgramModel program) {
-    return addProgramHttp(program);
-  }
-
-  @override
-  Future<bool> updateProgram(ProgramModel program) {
-    return updateProgramHttp(program);
-  }
-
-  @override
-  Future<bool> deleteProgram(int id) {
-    return deleteProgramHttp(id);
+    return completer.future;
   }
 }
