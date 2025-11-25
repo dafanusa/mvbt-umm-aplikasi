@@ -12,18 +12,16 @@ import 'app/UI/jadwal/controllers/jadwal_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🟢 Init Hive
-  await Hive.initFlutter();
-  Hive.registerAdapter(JadwalModelAdapter()); // WAJIB untuk Hive Model
 
-  // 🟢 Init Supabase
+  await Hive.initFlutter();
+  Hive.registerAdapter(JadwalModelAdapter()); 
+
   await Supabase.initialize(
     url: "https://pgrmuxoxruzkvgsqderg.supabase.co",
     anonKey:
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBncm11eG94cnV6a3Znc3FkZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzMDUwMDgsImV4cCI6MjA3ODg4MTAwOH0.KiyCVlDVyBJat_ROdZCWrDIV5RnwRiwz7c8eF4Y7ih4",
   );
 
-  // 🔵 Register global controllers
   Get.put(LoginController(), permanent: true);
   Get.put(ThemeController(), permanent: true);
   Get.put(JadwalController(), permanent: true);
@@ -36,7 +34,6 @@ class VolleyballActivityManagerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ⛔ PENTING! ThemeController harus dipanggil di sini
     final themeC = Get.find<ThemeController>();
 
     return Obx(() {
@@ -44,12 +41,9 @@ class VolleyballActivityManagerApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'MVBT Activity Manager',
 
-        // 🎨 Tema lengkap
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: themeC.isDark.value ? ThemeMode.dark : ThemeMode.light,
-
-        // 🔥 Routing
         initialRoute: Routes.login,
         getPages: AppPages.routes,
       );
