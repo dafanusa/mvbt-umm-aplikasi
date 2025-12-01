@@ -13,7 +13,7 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           _buildSliverHeader(context),
@@ -233,7 +233,7 @@ class HomeView extends GetView<HomeController> {
                     "Belum ada kegiatan terbaru 😌",
                     style: TextStyle(
                       fontSize: 16,
-                      color: theme.colorScheme.onBackground.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                 ),
@@ -341,7 +341,7 @@ class HomeView extends GetView<HomeController> {
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: theme.colorScheme.onBackground,
+        color: theme.colorScheme.onSurface,
       ),
     );
   }

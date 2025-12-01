@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- 🛰️ Izin Lokasi untuk GPS, Network, Live Location -->
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+<!-- 🌍 Untuk Live location di background (Android 10+) -->
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
     <application
         android:label="demomobilemodul2"
         android:name="${applicationName}"

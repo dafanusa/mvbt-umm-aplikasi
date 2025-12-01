@@ -8,6 +8,7 @@ class MainNavigationController extends GetxController {
     'assignment',
     'calendar_month',
     'photo_album',
+    'location',
     'person',
   ];
 
@@ -16,6 +17,7 @@ class MainNavigationController extends GetxController {
     "Program",
     "Jadwal",
     "Gallery",
+    "Lokasi",
     "Profil",
   ];
 
@@ -38,10 +40,13 @@ class MainNavigationController extends GetxController {
         return Icons.calendar_month;
       case 'photo_album':
         return Icons.photo_album;
+      case 'location':
+        return Icons.location_on;
       case 'person':
         return Icons.person;
       default:
         return Icons.help_outline;
+        
     }
   }
 }

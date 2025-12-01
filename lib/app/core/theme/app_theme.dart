@@ -44,11 +44,10 @@ class AppTheme {
     ),
 
     colorScheme: const ColorScheme.light(
-      background: AppColors.background,
       surface: AppColors.surface,
       primary: Color.fromARGB(255, 122, 0, 0),
       secondary: Color.fromARGB(255, 122, 0, 0),
-    ).copyWith(surfaceVariant: AppColors.surfaceVariant),
+    ).copyWith(surfaceContainerHighest: AppColors.surfaceVariant),
   );
 
   // =================== DARK THEME ===================
@@ -92,10 +91,9 @@ class AppTheme {
     ),
 
     colorScheme: const ColorScheme.dark(
-      background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
       primary: Color.fromARGB(255, 122, 0, 0),
       secondary: Color.fromARGB(255, 122, 0, 0),
-    ).copyWith(surfaceVariant: AppColors.darkSurfaceVariant),
+    ).copyWith(surfaceContainerHighest: AppColors.darkSurfaceVariant),
   );
 }

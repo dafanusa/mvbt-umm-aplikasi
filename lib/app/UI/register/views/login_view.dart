@@ -6,6 +6,8 @@ class LoginView extends GetView<LoginController> {
   final emailC = TextEditingController();
   final passC = TextEditingController();
 
+  LoginView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

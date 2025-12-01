@@ -6,6 +6,7 @@ import '../../profile/views/profile_view.dart';
 import '../../program/views/program_view.dart';
 import '../../jadwal/views/jadwal_view.dart';
 import '../controllers/main_navigation_controller.dart';
+import '../../location/views/location_view.dart';
 
 class MainNavigationView extends GetView<MainNavigationController> {
   final String username;
@@ -24,6 +25,7 @@ class MainNavigationView extends GetView<MainNavigationController> {
       _wrapWithBottomPadding(ProgramView(maroon: maroon)),
       _wrapWithBottomPadding(JadwalView(maroon: maroon)),
       _wrapWithBottomPadding(GalleryView(maroon: maroon)),
+      _wrapWithBottomPadding(LocationView(maroon: maroon)),
       _wrapWithBottomPadding(ProfileView(username: username)),
     ];
 

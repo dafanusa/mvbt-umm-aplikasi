@@ -10,8 +10,7 @@ import '../../../models/jadwal_model.dart';
 class JadwalView extends GetView<JadwalController> {
   final Color maroon;
 
-  const JadwalView({Key? key, this.maroon = const Color(0xFF800000)})
-    : super(key: key);
+  const JadwalView({super.key, this.maroon = const Color(0xFF800000)});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +18,7 @@ class JadwalView extends GetView<JadwalController> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
 
       floatingActionButton: Obx(() {
         return loginC.userRole.value == "admin"
@@ -94,7 +93,7 @@ class JadwalView extends GetView<JadwalController> {
         titleCentered: true,
         formatButtonVisible: false,
         titleTextStyle: TextStyle(
-          color: theme.colorScheme.onBackground,
+          color: theme.colorScheme.onSurface,
           fontWeight: FontWeight.bold,
         ),
       ),

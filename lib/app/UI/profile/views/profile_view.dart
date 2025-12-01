@@ -14,7 +14,7 @@ class ProfileView extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: SingleChildScrollView(
         child: Column(
           children: [

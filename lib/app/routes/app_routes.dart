@@ -9,4 +9,9 @@ abstract class Routes {
   static const gallery = '/gallery';
   static const profile = '/profile';
   static const mainNavigation = '/main_navigation';
+  static const location = '/location';
+  static const livelocation = '/live-location';
+  static const gps = '/gps-map';
+  static const network = '/network-map';
+  static const map = '/osm-map';
 }
