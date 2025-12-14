@@ -1,9 +1,12 @@
+// lib/models/program_model.dart
+
 class ProgramModel {
   final int id;
   final String title;
   final String description;
-  final String date; 
+  final String date;
   final String status;
+  // Kolom 'isActive' DIHAPUS karena tidak ada di database Supabase Anda.
 
   ProgramModel({
     required this.id,
@@ -13,41 +16,40 @@ class ProgramModel {
     required this.status,
   });
 
-  // ================================
-  // FROM JSON (Supabase & API)
-  // ================================
+  // Constructor untuk membuat objek dari data JSON (dari Supabase)
   factory ProgramModel.fromJson(Map<String, dynamic> json) {
     return ProgramModel(
-      id: json["id"] is int ? json["id"] : int.tryParse(json["id"].toString()) ?? 0,
-      title: json["title"] ?? "",
-      description: json["description"] ?? "",
-      date: json["date"] ?? "",
-      status: json["status"] ?? "",
+      id: json['id'] as int,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      date: json['date'] as String,
+      status: json['status'] as String,
+      // isActive tidak ada di sini
     );
   }
 
-  // ================================
-  // UPDATE / SEND FULL DATA
-  // ================================
+  // Method untuk mengubah objek menjadi Map (untuk dikirim ke Supabase)
   Map<String, dynamic> toJson() {
     return {
-      "title": title,
-      "description": description,
-      "date": date,
-      "status": status,
+      // id tidak perlu dikirim saat INSERT (auto-increment)
+      // id: id,
+      'title': title,
+      'description': description,
+      'date': date,
+      'status': status,
+      // 'is_active': isActive, // DIHAPUS
     };
   }
 
-  // ================================
-  // CREATE (INSERT ONLY)
-  // id TIDAK BOLEH DIKIRIM
-  // ================================
-  Map<String, dynamic> toJsonCreate() {
+  // Method untuk objek update (biasanya id perlu)
+  Map<String, dynamic> toUpdateJson() {
     return {
-      "title": title,
-      "description": description,
-      "date": date,
-      "status": status,
+      'id': id,
+      'title': title,
+      'description': description,
+      'date': date,
+      'status': status,
+      // 'is_active': isActive, // DIHAPUS
     };
   }
 }

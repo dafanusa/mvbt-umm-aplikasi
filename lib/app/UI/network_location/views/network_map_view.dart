@@ -16,7 +16,6 @@ class NetworkMapView extends GetView<NetworkMapController> {
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
         actions: [
-          /// Tombol refresh stream
           Obx(() {
             return IconButton(
               onPressed: controller.isLoading.value
@@ -33,7 +32,6 @@ class NetworkMapView extends GetView<NetworkMapController> {
         ],
       ),
 
-      // BODY ------------------------------------------------------------------
       body: Obx(() {
         final data = controller.currentNetworkLocation.value;
 
@@ -66,9 +64,7 @@ class NetworkMapView extends GetView<NetworkMapController> {
     );
   }
 
-  // ==========================================================================
   // MAP WIDGET
-  // ==========================================================================
   Widget _buildMap(NetworkLocationData? data) {
     if (data == null) {
       return SizedBox(
@@ -95,8 +91,6 @@ class NetworkMapView extends GetView<NetworkMapController> {
               urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
               userAgentPackageName: "com.mvbtumm.aplikasi",
             ),
-
-            /// MARKER (UPDATED REAL TIME)
             Obx(() {
               final live = controller.currentNetworkLocation.value;
               if (live == null) return MarkerLayer(markers: []);
@@ -122,9 +116,7 @@ class NetworkMapView extends GetView<NetworkMapController> {
     );
   }
 
-  // ==========================================================================
   // DATA CARD
-  // ==========================================================================
   Widget _buildDataCard(BuildContext context, NetworkLocationData? d) {
     return Container(
       width: double.infinity,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "471331944658",
+    "project_id": "mvbtummaplikasi",
+    "storage_bucket": "mvbtummaplikasi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471331944658:android:04c263ede13c4744a5d50b",
+        "android_client_info": {
+          "package_name": "com.example.mvbtummaplikasi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6EynQi7HQ0LeH1-Vx0_3gYzkf7hq4HMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

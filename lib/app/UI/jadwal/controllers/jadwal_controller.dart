@@ -1,64 +1,83 @@
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/jadwal_model.dart';
-import '../../login/controllers/login_controller.dart';
 
 class JadwalController extends GetxController {
-  // ROLE
-  final loginC = Get.find<LoginController>();
+  final supabase = Supabase.instance.client;
 
-  // HIVE BOX
-  late Box<JadwalModel> _jadwalBox;
+  final events = <JadwalModel>[].obs;
 
-  // STATE FOR UI
-  Rx<DateTime> focusedDay = DateTime.now().obs;
-  Rx<DateTime?> selectedDay = Rx<DateTime?>(null);
-  RxString selectedFilter = "Semua".obs;
-
-  // LIST DATA JADWAL
-  RxList<JadwalModel> events = <JadwalModel>[].obs;
+  final selectedDay = Rxn<DateTime>();
+  final focusedDay = DateTime.now().obs;
+  final selectedFilter = "Semua".obs;
 
   @override
   void onInit() {
     super.onInit();
-    _openHiveBox();
+    fetchJadwal();
   }
 
-  // =====================================================
-  // HIVE OPEN BOX & LOAD DATA
-  // =====================================================
+  // ================= FETCH =================
+  Future<void> fetchJadwal() async {
+    final res = await supabase.from('jadwal').select().order('date');
 
-  Future<void> _openHiveBox() async {
-    _jadwalBox = await Hive.openBox<JadwalModel>('jadwal');
-    loadJadwal();
+    events.value = (res as List).map((e) => JadwalModel.fromJson(e)).toList();
   }
 
-  void loadJadwal() {
-    events.value = _jadwalBox.values.toList();
+  // ================= ADD =================
+  Future<void> addJadwal(JadwalModel item) async {
+    await supabase.from('jadwal').insert(item.toJson());
+    fetchJadwal();
   }
 
-  // AUTO INCREMENT ID
-  int get nextId => _jadwalBox.isEmpty ? 1 : _jadwalBox.values.last.id + 1;
+  // ================= UPDATE =================
+  Future<void> updateJadwal(JadwalModel item) async {
+    await supabase.from('jadwal').update(item.toJson()).eq('id', item.id);
 
-  // =====================================================
-  // FILTERING
-  // =====================================================
+    fetchJadwal();
+  }
 
-  List<JadwalModel> get filteredEvents {
+  // ================= DELETE =================
+  Future<void> deleteJadwal(int id) async {
+    await supabase.from('jadwal').delete().eq('id', id);
+    fetchJadwal();
+  }
+
+  // ================= CALENDAR =================
+  void onDaySelected(DateTime selected, DateTime focused) {
+    selectedDay.value = selected;
+    focusedDay.value = focused;
+  }
+
+void setFilter(String f) {
+    selectedFilter.value = f;
+
+    if (f == "Semua") {
+      selectedDay.value = null;
+    }
+  }
+
+
+List<JadwalModel> get filteredEvents {
     return events.where((e) {
-      final isSameDay = selectedDay.value == null
+      // FILTER TANGGAL
+      final matchDate = selectedDay.value == null
           ? true
           : e.date.year == selectedDay.value!.year &&
-              e.date.month == selectedDay.value!.month &&
-              e.date.day == selectedDay.value!.day;
+                e.date.month == selectedDay.value!.month &&
+                e.date.day == selectedDay.value!.day;
 
-      final matchesFilter =
-          selectedFilter.value == "Semua" || e.category == selectedFilter.value;
+      // FILTER KATEGORI (DINAMIS)
+      final matchCategory = selectedFilter.value == "Semua"
+          ? true
+          : e.category == selectedFilter.value;
 
-      return isSameDay && matchesFilter;
+      return matchDate && matchCategory;
     }).toList();
   }
 
+
+  // ================= MARKERS =================
   List<DateTime> get latihanDates =>
       events.where((e) => e.category == "Latihan").map((e) => e.date).toList();
 
@@ -67,112 +86,5 @@ class JadwalController extends GetxController {
       .map((e) => e.date)
       .toList();
 
-  void onDaySelected(DateTime day, DateTime focusDay) {
-    selectedDay.value = day;
-    focusedDay.value = focusDay;
-  }
-
-  void setFilter(String filter) {
-    selectedFilter.value = filter;
-  }
-
-  // =====================================================
-  // FORMAT HARI & TANGGAL
-  // =====================================================
-
-  String formatDate(DateTime date) {
-    const bulan = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
-    return "${_hari(date.weekday)}, ${date.day} ${bulan[date.month - 1]} ${date.year}";
-  }
-
-  String _hari(int d) {
-    switch (d) {
-      case 1:
-        return "Senin";
-      case 2:
-        return "Selasa";
-      case 3:
-        return "Rabu";
-      case 4:
-        return "Kamis";
-      case 5:
-        return "Jumat";
-      case 6:
-        return "Sabtu";
-      case 7:
-        return "Minggu";
-      default:
-        return "";
-    }
-  }
-
-  // =====================================================
-  // CRUD REAL DENGAN HIVE
-  // =====================================================
-
-  Future<void> addJadwal(JadwalModel item) async {
-    if (loginC.userRole.value != "admin") {
-      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh menambah jadwal");
-      return;
-    }
-
-    await _jadwalBox.add(item);
-    loadJadwal();
-
-    Get.snackbar("Sukses", "Jadwal berhasil ditambahkan");
-  }
-
-  /// 🔥 UPDATE MENGGUNAKAN 1 ARGUMEN SAJA (JadwalModel)
-  Future<void> updateJadwal(JadwalModel updated) async {
-    if (loginC.userRole.value != "admin") {
-      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh mengedit jadwal");
-      return;
-    }
-
-    // cari index berdasarkan ID
-    int index = _jadwalBox.values.toList().indexWhere((e) => e.id == updated.id);
-
-    if (index == -1) {
-      Get.snackbar("Error", "Jadwal tidak ditemukan");
-      return;
-    }
-
-    await _jadwalBox.putAt(index, updated);
-    loadJadwal();
-
-    Get.snackbar("Sukses", "Jadwal berhasil diperbarui");
-  }
-
-  Future<void> deleteJadwal(int id) async {
-    if (loginC.userRole.value != "admin") {
-      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh menghapus jadwal");
-      return;
-    }
-
-    // cari index berdasarkan ID
-    int index = _jadwalBox.values.toList().indexWhere((e) => e.id == id);
-
-    if (index == -1) {
-      Get.snackbar("Error", "Jadwal tidak ditemukan");
-      return;
-    }
-
-    await _jadwalBox.deleteAt(index);
-    loadJadwal();
-
-    Get.snackbar("Sukses", "Jadwal berhasil dihapus");
-  }
+  String formatDate(DateTime d) => "${d.day}/${d.month}/${d.year}";
 }

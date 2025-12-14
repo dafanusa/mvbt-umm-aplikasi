@@ -1,95 +1,88 @@
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/program_model.dart';
-import '../../../../services/program_supabase_service.dart';
-import '../../login/controllers/login_controller.dart';
 
 class ProgramController extends GetxController {
-  final ProgramSupabaseService supabaseService = ProgramSupabaseService();
-  final LoginController loginC = Get.find<LoginController>();
+  final SupabaseClient _supabase = Supabase.instance.client;
 
-  // DATA PROGRAM
-  RxList<ProgramModel> programs = <ProgramModel>[].obs;
-
-  // LOADING
-  RxBool isLoading = false.obs;
+  final programs = <ProgramModel>[].obs;
+  final isLoading = true.obs;
 
   @override
   void onInit() {
+    getPrograms();
     super.onInit();
-    getPrograms(); // langsung ambil dari SUPABASE
   }
 
-  // =====================================================
-  // AMBIL DATA DARI SUPABASE
-  // =====================================================
+  /// ==========================
+  ///        GET PROGRAMS
+  /// ==========================
   Future<void> getPrograms() async {
+    isLoading.value = true;
     try {
-      isLoading.value = true;
-      final result = await supabaseService.getPrograms();
-      programs.assignAll(result);
+      final data = await _supabase
+          .from('programs')
+          .select('*')
+          .order('date', ascending: true);
+
+      programs.value = data
+          .map<ProgramModel>((json) => ProgramModel.fromJson(json))
+          .toList();
     } catch (e) {
-      Get.snackbar("Error", "Gagal memuat program: $e");
+      Get.snackbar("Error", "Gagal memuat data: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-  // =====================================================
-  // TAMBAH PROGRAM → SUPABASE
-  // =====================================================
-  Future<void> addProgram(ProgramModel p) async {
-    if (loginC.userRole.value != "admin") {
-      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh menambah program");
-      return;
-    }
+  /// ==========================
+  ///         ADD PROGRAM
+  /// ==========================
+  Future<void> addProgram(ProgramModel program) async {
+    try {
+      // Gunakan toJson() — TANPA id
+      await _supabase.from('programs').insert(program.toJson());
 
-    final ok = await supabaseService.addProgram(p);
-
-    if (ok) {
-      await getPrograms(); // WAJIB! Refresh data UI
-      Get.back();
-      Get.snackbar("Success", "Program berhasil ditambahkan");
-    } else {
-      Get.snackbar("Error", "Gagal menambah program");
+      Get.snackbar("Berhasil", "Program berhasil ditambahkan.");
+      await getPrograms();
+    } catch (e) {
+      Get.snackbar("Error", "Gagal menambah program: $e");
     }
   }
 
-  // =====================================================
-  // UPDATE PROGRAM → SUPABASE
-  // =====================================================
-  Future<void> updateProgram(ProgramModel p) async {
-    if (loginC.userRole.value != "admin") {
-      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh mengedit program");
-      return;
-    }
+  /// ==========================
+  ///       UPDATE PROGRAM
+  /// ==========================
+  Future<void> updateProgram(ProgramModel program) async {
+    try {
+      final updateData = {
+        'title': program.title,
+        'description': program.description,
+        'date': program.date,
+        'status': program.status,
+      };
 
-    final ok = await supabaseService.updateProgram(p);
+      await _supabase.from('programs').update(updateData).eq('id', program.id);
 
-    if (ok) {
-      await getPrograms(); // refresh setelah update
-      Get.back();
-      Get.snackbar("Success", "Program diperbarui");
-    } else {
-      Get.snackbar("Error", "Gagal memperbarui program");
+      Get.snackbar("Berhasil", "Program berhasil diperbarui.");
+      await getPrograms();
+    } catch (e) {
+      Get.snackbar("Error", "Gagal update program: $e");
     }
   }
 
-  // =====================================================
-  // DELETE PROGRAM → SUPABASE
-  // =====================================================
+  /// ==========================
+  ///       DELETE PROGRAM
+  /// ==========================
   Future<void> deleteProgram(int id) async {
-    if (loginC.userRole.value != "admin") {
-      Get.snackbar("Akses Ditolak", "Hanya admin yang boleh menghapus program");
-      return;
-    }
+    try {
+      await _supabase.from('programs').delete().eq('id', id);
 
-    final ok = await supabaseService.deleteProgram(id);
+      programs.removeWhere((p) => p.id == id);
 
-    if (ok) {
-      await getPrograms(); // refresh setelah hapus
-      Get.snackbar("Success", "Program dihapus");
-    } else {
-      Get.snackbar("Error", "Gagal menghapus program");
+      Get.snackbar("Berhasil", "Program berhasil dihapus.");
+    } catch (e) {
+      Get.snackbar("Error", "Gagal menghapus program: $e");
     }
   }
 }

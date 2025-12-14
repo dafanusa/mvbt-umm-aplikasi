@@ -3,65 +3,85 @@ import '../app/models/program_model.dart';
 
 class ProgramSupabaseService {
   final supabase = Supabase.instance.client;
-  final String table = "programs";
 
-  // =====================================================
-  // CREATE (INSERT)
-  // =====================================================
-  Future<bool> addProgram(ProgramModel p) async {
-    try {
-      await supabase.from(table).insert(p.toJsonCreate());
-      return true;
-    } catch (e) {
-      print("Supabase Add Error: $e");
-      return false;
-    }
-  }
-
-  // =====================================================
-  // UPDATE
-  // =====================================================
-  Future<bool> updateProgram(ProgramModel p) async {
-    try {
-      await supabase
-          .from(table)
-          .update(p.toJson()) // toJson: mengirim semua kolom kecuali id
-          .eq("id", p.id);
-
-      return true;
-    } catch (e) {
-      print("Supabase Update Error: $e");
-      return false;
-    }
-  }
-
-  // =====================================================
-  // DELETE
-  // =====================================================
-  Future<bool> deleteProgram(int id) async {
-    try {
-      await supabase.from(table).delete().eq("id", id);
-      return true;
-    } catch (e) {
-      print("Supabase Delete Error: $e");
-      return false;
-    }
-  }
-
-  // =====================================================
-  // READ ALL
-  // =====================================================
+  /// 🔹 GET ALL PROGRAM
   Future<List<ProgramModel>> getPrograms() async {
-    try {
-      final data = await supabase.from(table).select();
+    // Pastikan select('*') berjalan lancar karena Model sudah disesuaikan
+    // untuk mengabaikan kolom is_active yang tidak ada di DB.
+    final response = await supabase
+        .from('programs')
+        .select('*')
+        // Ganti order 'id' dengan 'date' agar urutan lebih logis untuk program kerja
+        .order('date', ascending: true);
 
-      return (data as List)
-          .map<ProgramModel>((e) => ProgramModel.fromJson(e))
-          .toList();
+    // Casting response ke List<dynamic> lebih aman sebelum mapping
+    return (response as List<dynamic>)
+        .map((json) => ProgramModel.fromJson(json))
+        .toList();
+  }
 
-    } catch (e) {
-      print("Supabase Get Error: $e");
-      return [];
-    }
+  /// 🔹 GET DETAIL PROGRAM BY ID
+  Future<ProgramModel?> getProgramById(int id) async {
+    // select() dan eq() tidak perlu perubahan
+    final response = await supabase
+        .from('programs')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+
+    if (response == null) return null;
+    return ProgramModel.fromJson(response);
+  }
+
+  /// 🔹 CREATE PROGRAM
+  Future<bool> createProgram(ProgramModel program) async {
+    // *** PERUBAHAN UTAMA: HAPUS 'is_active' dari data yang akan di-INSERT ***
+    final data = {
+      'title': program.title,
+      'description': program.description,
+      'date': program.date,
+      // 'is_active': program.isActive, // DIHAPUS karena tidak ada di DB
+      'status': program.status,
+    };
+
+    // Supabase insert akan mengembalikan data yang di-insert jika berhasil,
+    // jika gagal akan melempar error. Kita bisa check apakah ada data yang kembali (data yang di-insert)
+    final response = await supabase.from('programs').insert(data).select();
+
+    // Periksa apakah response adalah list yang tidak kosong
+    return response.isNotEmpty;
+  }
+
+  /// 🔹 UPDATE PROGRAM
+  Future<bool> updateProgram(ProgramModel program) async {
+    // *** PERUBAHAN UTAMA: HAPUS 'is_active' dari data yang akan di-UPDATE ***
+    final data = {
+      'title': program.title,
+      'description': program.description,
+      'date': program.date,
+      // 'is_active': program.isActive, // DIHAPUS karena tidak ada di DB
+      'status': program.status,
+    };
+
+    // Tambahkan .select() untuk memastikan operasi berhasil dan mengembalikan data
+    final response = await supabase
+        .from('programs')
+        .update(data)
+        .eq('id', program.id)
+        .select();
+
+    return response.isNotEmpty;
+  }
+
+  /// 🔹 DELETE PROGRAM
+  Future<bool> deleteProgram(int id) async {
+    // Tambahkan .select() untuk memastikan operasi berhasil dan mengembalikan data
+    final response = await supabase
+        .from('programs')
+        .delete()
+        .eq('id', id)
+        .select();
+
+    return response.isNotEmpty;
   }
 }

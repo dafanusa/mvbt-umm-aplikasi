@@ -13,9 +13,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
 
-  await Hive.initFlutter();
-  Hive.registerAdapter(JadwalModelAdapter()); 
-
   await Supabase.initialize(
     url: "https://pgrmuxoxruzkvgsqderg.supabase.co",
     anonKey:
