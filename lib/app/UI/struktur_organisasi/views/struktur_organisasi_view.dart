@@ -83,7 +83,7 @@ class StrukturOrganisasiView extends GetView<StrukturOrganisasiController> {
     );
   }
 
-  // ================= CARD ITEM =================
+  // =========== CARD ITEM =======
   Widget _card(
     BuildContext context,
     StrukturOrganisasiModel data,
