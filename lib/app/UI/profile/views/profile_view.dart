@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mvbtummaplikasi/app/core/values/app_colors.dart';
 import 'package:mvbtummaplikasi/app/routes/app_pages.dart';
 
 class ProfileView extends StatelessWidget {
@@ -11,7 +10,6 @@ class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -22,18 +20,22 @@ class ProfileView extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(top: 50, bottom: 24),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 122, 0, 0), 
-                borderRadius: const BorderRadius.vertical(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 122, 0, 0),
+                borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(30),
                 ),
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 38,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 48, color: const Color.fromARGB(255, 122, 0, 0)),
+                    child: Icon(
+                      Icons.person,
+                      size: 48,
+                      color: Color.fromARGB(255, 122, 0, 0),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -69,19 +71,67 @@ class ProfileView extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // ================= ORGANISASI =================
+            // ================= DETAIL ORGANISASI =================
             _infoSection(
               context,
               title: "Detail Organisasi",
               icon: Icons.apartment,
-              children: const [
-                _infoItem(Icons.work, "Jabatan", "Ketua Umum"),
-                _infoItem(Icons.verified_user, "Status", "Aktif"),
+              children: [
+                const _infoItem(Icons.work, "Jabatan", "Ketua Umum"),
+                const _infoItem(Icons.verified_user, "Status", "Aktif"),
+                const SizedBox(height: 12),
+
+                // ===== BUTTON STRUKTUR ORGANISASI =====
+                InkWell(
+                  onTap: () {
+                    Get.toNamed(Routes.strukturorganisasi);
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(
+                        255,
+                        122,
+                        0,
+                        0,
+                      ).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.account_tree,
+                          color: Color.fromARGB(255, 122, 0, 0),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "Lihat Struktur Organisasi",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Color.fromARGB(255, 122, 0, 0),
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 14,
+                          color: Color.fromARGB(255, 122, 0, 0),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
 
             const SizedBox(height: 24),
 
+            // ================= LOGOUT =================
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ElevatedButton.icon(
@@ -100,28 +150,30 @@ class ProfileView extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 30)
+
+            const SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
 
-  // SECTION BOX
+  // ================= INFO SECTION =================
   Widget _infoSection(
     BuildContext context, {
     required String title,
     required IconData icon,
     required List<Widget> children,
   }) {
-    final theme = Theme.of(context);
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,17 +184,15 @@ class ProfileView extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 122, 0, 0),
+                  color: Color.fromARGB(255, 122, 0, 0),
                   fontSize: 16,
                 ),
               ),
-              const Spacer(),
-              Icon(Icons.edit, size: 18, color: const Color.fromARGB(255, 122, 0, 0)),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           ...children,
         ],
       ),
@@ -150,6 +200,7 @@ class ProfileView extends StatelessWidget {
   }
 }
 
+// ================= INFO ITEM =================
 class _infoItem extends StatelessWidget {
   final IconData icon;
   final String label;

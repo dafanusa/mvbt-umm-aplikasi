@@ -23,6 +23,9 @@ import '../UI/network_location/views/network_map_view.dart';
 import '../UI/location/bindings/location_binding.dart';
 import '../UI/gps_location/bindings/gps_map_binding.dart';
 import '../UI/network_location/bindings/network_map_binding.dart';
+import '../UI/struktur_organisasi/bindings/struktur_organisasi_binding.dart';
+import '../UI/struktur_organisasi/views/struktur_organisasi_view.dart';
+import '../UI/struktur_organisasi/controllers/struktur_organisasi_controller.dart';
 
 part 'app_routes.dart';
 
@@ -77,6 +80,11 @@ class AppPages {
       name: Routes.profile,
       page: () => const ProfileView(username: ''),
       binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: Routes.strukturorganisasi,
+      page: () => const StrukturOrganisasiView(),
+      binding: StrukturOrganisasiBinding(),
     ),
     GetPage(
       name: Routes.location,

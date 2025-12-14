@@ -503,7 +503,6 @@ class ProgramView extends GetView<ProgramController> {
                 p,
               ) {
                 if (_selectedFilter.value == "Semua") return true;
-                // Logika filter disesuaikan dengan status yang ada di DB
                 if (_selectedFilter.value == "Akan Datang") {
                   return p.status == "Akan Datang";
                 } else if (_selectedFilter.value == "Berlangsung") {

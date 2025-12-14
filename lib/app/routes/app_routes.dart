@@ -14,4 +14,5 @@ abstract class Routes {
   static const gps = '/gps-map';
   static const network = '/network-map';
   static const map = '/osm-map';
+  static const strukturorganisasi = '/struktur_organisasi';
 }
