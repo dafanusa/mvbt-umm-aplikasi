@@ -27,6 +27,7 @@ class JadwalController extends GetxController {
 
   Future<void> addJadwal(JadwalModel item) async {
     await supabase.from('jadwal').insert(item.toJson());
+    await fetchJadwal();
 
     // 🔔 SCHEDULE NOTIF H-1 JAM
     await LocalNotificationService.scheduleReminder(
