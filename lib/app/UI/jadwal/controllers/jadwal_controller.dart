@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/jadwal_model.dart';
+import '../../../../services/local_notification_service.dart';
 
 class JadwalController extends GetxController {
   final supabase = Supabase.instance.client;
@@ -24,9 +25,18 @@ class JadwalController extends GetxController {
     events.value = (res as List).map((e) => JadwalModel.fromJson(e)).toList();
   }
 
-  // ================= ADD =================
   Future<void> addJadwal(JadwalModel item) async {
     await supabase.from('jadwal').insert(item.toJson());
+
+    // 🔔 SCHEDULE NOTIF H-1 JAM
+    await LocalNotificationService.scheduleReminder(
+      id: item.id,
+      title: "Pengingat Jadwal",
+      body: "${item.title} akan dimulai pukul ${item.time}",
+      scheduledTime: item.jadwalTime.subtract(const Duration(hours: 1)),
+      payload: {'type': 'jadwal', 'title': item.title},
+    );
+
     fetchJadwal();
   }
 
@@ -34,12 +44,26 @@ class JadwalController extends GetxController {
   Future<void> updateJadwal(JadwalModel item) async {
     await supabase.from('jadwal').update(item.toJson()).eq('id', item.id);
 
+    // 🔄 CANCEL & RESCHEDULE
+    await LocalNotificationService.cancel(item.id);
+    await LocalNotificationService.scheduleReminder(
+      id: item.id,
+      title: "Pengingat Jadwal",
+      body: "${item.title} akan dimulai pukul ${item.time}",
+      scheduledTime: item.jadwalTime.subtract(const Duration(hours: 1)),
+      payload: {'type': 'jadwal', 'title': item.title},
+    );
+
     fetchJadwal();
   }
 
   // ================= DELETE =================
   Future<void> deleteJadwal(int id) async {
     await supabase.from('jadwal').delete().eq('id', id);
+
+    // ❌ HAPUS NOTIF
+    await LocalNotificationService.cancel(id);
+
     fetchJadwal();
   }
 
@@ -49,7 +73,7 @@ class JadwalController extends GetxController {
     focusedDay.value = focused;
   }
 
-void setFilter(String f) {
+  void setFilter(String f) {
     selectedFilter.value = f;
 
     if (f == "Semua") {
@@ -57,8 +81,7 @@ void setFilter(String f) {
     }
   }
 
-
-List<JadwalModel> get filteredEvents {
+  List<JadwalModel> get filteredEvents {
     return events.where((e) {
       // FILTER TANGGAL
       final matchDate = selectedDay.value == null
@@ -75,7 +98,6 @@ List<JadwalModel> get filteredEvents {
       return matchDate && matchCategory;
     }).toList();
   }
-
 
   // ================= MARKERS =================
   List<DateTime> get latihanDates =>

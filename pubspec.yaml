@@ -60,6 +60,7 @@ dependencies:
   geolocator: ^10.0.0
   geocoding: ^2.1.1
   fl_chart: ^0.69.0
+  timezone: ^0.9.4
 
 
 dev_dependencies:
