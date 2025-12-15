@@ -52,7 +52,7 @@ class JadwalView extends GetView<JadwalController> {
                           onPressed: () {
                             LocalNotificationService.show(
                               title: "⏰ Reminder Latihan",
-                              body: "Latihan akan dimulai sebentar lagi",
+                              body: "Latihan akan dimulai dalam 1 jam!",
                               payload: {"type": "jadwal_test"},
                             );
                           },
@@ -186,49 +186,111 @@ class JadwalView extends GetView<JadwalController> {
   }
 
   // ================= EVENT CARD =================
-  Widget _eventCard(JadwalModel e) {
+ Widget _eventCard(JadwalModel e) {
     final loginC = Get.find<LoginController>();
+    final isLatihan = e.category == "Latihan";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: e.category == "Latihan"
-            ? const Color(0xFF0D47A1)
-            : const Color(0xFF7A0000),
+        color: isLatihan
+            ? const Color(0xFF0D47A1) // Biru
+            : const Color(0xFF7A0000), // Merah
         borderRadius: BorderRadius.circular(14),
       ),
-
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ================= ICON =================
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isLatihan ? Icons.directions_run : Icons.emoji_events,
+              color: Colors.white,
+              size: 26,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // ================= CONTENT =================
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ===== BADGE =====
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    isLatihan ? "LATIHAN" : "PERTANDINGAN",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                // ===== TITLE =====
                 Text(
                   e.title,
                   style: const TextStyle(
                     color: Colors.white,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
+                const SizedBox(height: 4),
+
+                // ===== DATE =====
                 Text(
                   controller.formatDate(e.date),
-                  style: const TextStyle(color: Colors.white70),
+                  style: const TextStyle(color: Colors.white70, fontSize: 13),
                 ),
-                Text(
-                  "${e.jadwalTime.hour.toString().padLeft(2, '0')}:${e.jadwalTime.minute.toString().padLeft(2, '0')}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+
+                const SizedBox(height: 2),
+
+                // ===== TIME =====
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.access_time,
+                      color: Colors.white70,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "${e.jadwalTime.hour.toString().padLeft(2, '0')}:${e.jadwalTime.minute.toString().padLeft(2, '0')}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
+          // ================= ADMIN ACTION =================
           if (loginC.userRole.value == "admin")
-            Row(
+            Column(
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.white),
@@ -244,6 +306,7 @@ class JadwalView extends GetView<JadwalController> {
       ),
     );
   }
+
 
   // ================= FORM =================
   void _showAddDialog(BuildContext context) {

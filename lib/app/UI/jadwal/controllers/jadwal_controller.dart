@@ -44,6 +44,7 @@ class JadwalController extends GetxController {
   // ================= UPDATE =================
   Future<void> updateJadwal(JadwalModel item) async {
     await supabase.from('jadwal').update(item.toJson()).eq('id', item.id);
+    await fetchJadwal();
 
     // 🔄 CANCEL & RESCHEDULE
     await LocalNotificationService.cancel(item.id);
