@@ -109,4 +109,8 @@ class LocalNotificationService {
   static Future<void> cancelAll() async {
     await _plugin.cancelAll();
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
