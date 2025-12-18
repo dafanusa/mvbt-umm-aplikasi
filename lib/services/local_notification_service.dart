@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../app/routes/app_pages.dart';
 
-
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -24,7 +23,7 @@ class LocalNotificationService {
     await _plugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (details) {
-  if (details.payload == null) return;
+        if (details.payload == null) return;
 
         final data = jsonDecode(details.payload!);
 
@@ -109,8 +108,4 @@ class LocalNotificationService {
   static Future<void> cancelAll() async {
     await _plugin.cancelAll();
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2

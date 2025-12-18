@@ -105,11 +105,7 @@ class JadwalView extends GetView<JadwalController> {
   }
 
   // ================= CALENDAR =================
-<<<<<<< HEAD
-Widget _calendar() {
-=======
   Widget _calendar() {
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
     return TableCalendar(
       firstDay: DateTime.utc(2024, 1, 1),
       lastDay: DateTime.utc(2030, 12, 31),
@@ -122,7 +118,6 @@ Widget _calendar() {
       onDaySelected: (selected, focused) =>
           controller.onDaySelected(selected, focused),
 
-<<<<<<< HEAD
       calendarStyle: CalendarStyle(
         // 🔴 HARI INI
         todayDecoration: const BoxDecoration(
@@ -150,8 +145,6 @@ Widget _calendar() {
         outsideDecoration: const BoxDecoration(shape: BoxShape.circle),
       ),
 
-=======
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, date, _) {
           if (controller.latihanDates.contains(date)) {
@@ -166,8 +159,7 @@ Widget _calendar() {
     );
   }
 
-
- Widget _dot(Color c) {
+  Widget _dot(Color c) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
@@ -179,11 +171,7 @@ Widget _calendar() {
   }
 
   // ================= FILTER =================
-<<<<<<< HEAD
-Widget _filterButtons() {
-=======
   Widget _filterButtons() {
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
     final filters = ["Semua", "Latihan", "Pertandingan"];
 
     return Row(
@@ -205,23 +193,16 @@ Widget _filterButtons() {
           // 🎨 WARNA
           backgroundColor: const Color.fromARGB(255, 220, 220, 220),
           selectedColor: const Color.fromARGB(255, 122, 0, 0),
-<<<<<<< HEAD
 
           // ❌ HILANGKAN BORDER TOTAL
           side: BorderSide.none,
           showCheckmark: true,
           checkmarkColor: Colors.white, // ✅ checklist putih
-=======
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
         );
       }).toList(),
     );
   }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
   // ================= EVENT LIST =================
   Widget _eventList() {
     final items = controller.filteredEvents;
@@ -237,11 +218,7 @@ Widget _filterButtons() {
   }
 
   // ================= EVENT CARD =================
-<<<<<<< HEAD
   Widget _eventCard(JadwalModel e) {
-=======
- Widget _eventCard(JadwalModel e) {
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
     final loginC = Get.find<LoginController>();
     final isLatihan = e.category == "Latihan";
 
@@ -362,10 +339,6 @@ Widget _filterButtons() {
     );
   }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 277bb2b9291cdd8e50739d997628e8060b7284a2
   // ================= FORM =================
   void _showAddDialog(BuildContext context) {
     _showJadwalForm(context, isEdit: false);

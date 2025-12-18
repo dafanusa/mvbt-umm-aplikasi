@@ -40,9 +40,7 @@ class HomeView extends GetView<HomeController> {
     final theme = Theme.of(context);
 
     // warna header menyesuaikan theme
-    final headerColor = theme.brightness == Brightness.dark
-        ? theme.colorScheme.primary.withOpacity(0.3)
-        : maroon;
+    final headerColor = maroon;
 
     return SliverAppBar(
       toolbarHeight: 120,
@@ -60,7 +58,7 @@ class HomeView extends GetView<HomeController> {
         child: Padding(
           padding: const EdgeInsets.only(left: 18, top: 10, bottom: 10),
           child: Text(
-            "Selamat Datang, di Aplikasi MVBT Activity Manager $username",
+            "Selamat Datang, di Aplikasi\nMVBT Activity Manager $username",
             style: TextStyle(
               color: theme.colorScheme.onPrimary,
               fontSize: 18,
@@ -74,35 +72,15 @@ class HomeView extends GetView<HomeController> {
 
       actions: [
         // TOMBOL DARK MODE
-        Obx(() {
-          final themeC = Get.find<ThemeController>();
-          return IconButton(
-            icon: Icon(
-              themeC.isDark.value ? Icons.dark_mode : Icons.light_mode,
-              color: theme.colorScheme.onPrimary,
-            ),
-            onPressed: () => themeC.toggleTheme(),
-          );
-        }),
 
         // LOGO KANAN
         Padding(
           padding: const EdgeInsets.only(right: 18, top: 10, bottom: 10),
           child: GestureDetector(
             onTap: () {},
-            child: Container(
+            child: SizedBox(
               width: 56,
               height: 56,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.shadowColor.withOpacity(0.2),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
               child: Image.asset('assets/mvbtnobg.png', fit: BoxFit.contain),
             ),
           ),
@@ -138,13 +116,15 @@ class HomeView extends GetView<HomeController> {
               ),
               const SizedBox(height: 8),
 
-              Obx(() => Text(
-                    controller.todaySchedule.value,
-                    style: TextStyle(
-                      color: theme.colorScheme.onPrimary,
-                      fontSize: 14,
-                    ),
-                  )),
+              Obx(
+                () => Text(
+                  controller.todaySchedule.value,
+                  style: TextStyle(
+                    color: theme.colorScheme.onPrimary,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
 
               const SizedBox(height: 12),
               Align(
@@ -192,19 +172,18 @@ class HomeView extends GetView<HomeController> {
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: theme.colorScheme.secondary,
-                width: 2,
-              ),
+              border: Border.all(color: theme.colorScheme.secondary, width: 2),
             ),
 
-            child: Obx(() => Text(
-                  controller.latestAnnouncement.value,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontSize: 15,
-                  ),
-                )),
+            child: Obx(
+              () => Text(
+                controller.latestAnnouncement.value,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 15,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -241,8 +220,9 @@ class HomeView extends GetView<HomeController> {
               );
             }
 
-            final int displayCount =
-                controller.events.length > 3 ? 3 : controller.events.length;
+            final int displayCount = controller.events.length > 3
+                ? 3
+                : controller.events.length;
 
             return ListView.separated(
               physics: const NeverScrollableScrollPhysics(),
@@ -312,8 +292,9 @@ class HomeView extends GetView<HomeController> {
                             "${event.date} | ${event.time} di ${event.location}",
                             style: TextStyle(
                               fontSize: 13,
-                              color: theme.colorScheme.onSurface
-                                  .withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.6,
+                              ),
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
