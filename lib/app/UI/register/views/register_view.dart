@@ -35,7 +35,7 @@ class _RegisterViewState extends State<RegisterView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/logomvbt.jpg', height: 90),
+                  Image.asset('assets/mvbtnobg.png', height: 90),
                   const SizedBox(height: 12),
                   const Text(
                     'MVBT ACTIVITY MANAGER',

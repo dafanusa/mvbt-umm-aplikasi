@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/jadwal_model.dart';
+import '../../../../services/local_notification_service.dart';
+
 
 class JadwalController extends GetxController {
   final supabase = Supabase.instance.client;
@@ -24,24 +26,50 @@ class JadwalController extends GetxController {
     events.value = (res as List).map((e) => JadwalModel.fromJson(e)).toList();
   }
 
-  // ================= ADD =================
-  Future<void> addJadwal(JadwalModel item) async {
+Future<void> addJadwal(JadwalModel item) async {
     await supabase.from('jadwal').insert(item.toJson());
+
+    // 🔔 SCHEDULE NOTIF H-1 JAM
+    await LocalNotificationService.scheduleReminder(
+      id: item.id,
+      title: "Pengingat Jadwal",
+      body: "${item.title} akan dimulai pukul ${item.time}",
+      scheduledTime: item.jadwalTime.subtract(const Duration(hours: 1)),
+      payload: {'type': 'jadwal', 'title': item.title},
+    );
+
     fetchJadwal();
   }
+
 
   // ================= UPDATE =================
-  Future<void> updateJadwal(JadwalModel item) async {
+Future<void> updateJadwal(JadwalModel item) async {
     await supabase.from('jadwal').update(item.toJson()).eq('id', item.id);
 
+    // 🔄 CANCEL & RESCHEDULE
+    await LocalNotificationService.cancel(item.id);
+    await LocalNotificationService.scheduleReminder(
+      id: item.id,
+      title: "Pengingat Jadwal",
+      body: "${item.title} akan dimulai pukul ${item.time}",
+      scheduledTime: item.jadwalTime.subtract(const Duration(hours: 1)),
+      payload: {'type': 'jadwal', 'title': item.title},
+    );
+
     fetchJadwal();
   }
 
+
   // ================= DELETE =================
-  Future<void> deleteJadwal(int id) async {
+Future<void> deleteJadwal(int id) async {
     await supabase.from('jadwal').delete().eq('id', id);
+
+    // ❌ HAPUS NOTIF
+    await LocalNotificationService.cancel(id);
+
     fetchJadwal();
   }
+
 
   // ================= CALENDAR =================
   void onDaySelected(DateTime selected, DateTime focused) {

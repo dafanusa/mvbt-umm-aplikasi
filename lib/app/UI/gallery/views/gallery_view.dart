@@ -15,6 +15,7 @@ class GalleryView extends GetView<GalleryController> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: maroon,
+        automaticallyImplyLeading: false,
         title: Text(
           'Gallery MVBT UMM',
           style: GoogleFonts.poppins(

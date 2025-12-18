@@ -48,7 +48,6 @@ dependencies:
   flutter_local_notifications: ^17.2.2
   firebase_analytics: ^11.6.0
   image_picker: ^1.2.1
-
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.1
@@ -60,6 +59,7 @@ dependencies:
   geolocator: ^10.0.0
   geocoding: ^2.1.1
   fl_chart: ^0.69.0
+  timezone: ^0.9.4
 
 
 dev_dependencies:
@@ -94,7 +94,12 @@ flutter:
     - assets/gallery3.jpg
     - assets/gallery4.jpg
     - assets/gallery5.jpg
-    - assets/logomvbt.jpg
+    - assets/mvbtapplogo.jpg
+    - assets/welcome1.jpg
+    - assets/welcome1.png
+    - assets/welcome2.jpg
+    - assets/welcome3.jpg
+    - assets/mvbtnobg.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -353,6 +353,7 @@ class ProgramView extends GetView<ProgramController> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: maroon,
+        automaticallyImplyLeading: false,
         title: const Text(
           "Program Kerja",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

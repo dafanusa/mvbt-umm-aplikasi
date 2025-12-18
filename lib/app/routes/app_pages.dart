@@ -26,6 +26,12 @@ import '../UI/network_location/bindings/network_map_binding.dart';
 import '../UI/struktur_organisasi/bindings/struktur_organisasi_binding.dart';
 import '../UI/struktur_organisasi/views/struktur_organisasi_view.dart';
 import '../UI/struktur_organisasi/controllers/struktur_organisasi_controller.dart';
+import '../UI/splash/views/splash_view.dart';
+import '../UI/splash/controllers/splash_controller.dart';
+import '../UI/splash/bindings/splash_binding.dart';
+import '../UI/welcome/views/welcome_view.dart';
+import '../UI/welcome/bindings/welcome_binding.dart';
+import '../UI/welcome/controllers/welcome_controller.dart';
 
 part 'app_routes.dart';
 
@@ -33,6 +39,16 @@ class AppPages {
   AppPages._();
 
   static final routes = [
+    GetPage(
+      name: Routes.splash,
+      page: () => const SplashView(),
+      binding: SplashBinding(),
+    ),
+    GetPage(
+      name: Routes.welcome,
+      page: () => const WelcomeView(),
+      binding: WelcomeBinding(),
+    ),
     GetPage(
       name: Routes.login,
       page: () => const LoginView(maroon: Color(0xFF800000)),

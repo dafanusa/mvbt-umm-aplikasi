@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../controllers/profile_controller.dart';
 import 'package:mvbtummaplikasi/app/routes/app_pages.dart';
 
-class ProfileView extends StatelessWidget {
-  final String username;
-
-  const ProfileView({super.key, required this.username});
+class ProfileView extends GetView<ProfileController> {
+  const ProfileView({super.key, required String username});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final maroon = const Color.fromARGB(255, 122, 0, 0);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -28,28 +28,34 @@ class ProfileView extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 38,
                     backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.person,
-                      size: 48,
-                      color: Color.fromARGB(255, 122, 0, 0),
-                    ),
+                    child: Icon(Icons.person, size: 48, color: maroon),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    username.isEmpty ? "Nama Pengguna" : username,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+
+                  Obx(
+                    () => Text(
+                      controller.namaLengkap.value,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
+
                   const SizedBox(height: 4),
-                  const Text(
-                    '202310370311200',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+
+                  Obx(
+                    () => Text(
+                      controller.nim.value,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -62,10 +68,18 @@ class ProfileView extends StatelessWidget {
               context,
               title: "Informasi Pribadi",
               icon: Icons.person_outline,
-              children: const [
-                _infoItem(Icons.badge, "Nama Lengkap", "Soekarno Hatta"),
-                _infoItem(Icons.credit_card, "NIM", "202310370311200"),
-                _infoItem(Icons.email, "Email", "soekarno.hatta@gmail.com"),
+              children: [
+                _editableItem(
+                  icon: Icons.badge,
+                  label: "Nama Lengkap",
+                  controller: controller.namaC,
+                ),
+                _editableItem(
+                  icon: Icons.credit_card,
+                  label: "NIM",
+                  controller: controller.nimC,
+                ),
+                _readonlyItem(Icons.email, "Email", controller.email.value),
               ],
             ),
 
@@ -77,11 +91,19 @@ class ProfileView extends StatelessWidget {
               title: "Detail Organisasi",
               icon: Icons.apartment,
               children: [
-                const _infoItem(Icons.work, "Jabatan", "Ketua Umum"),
-                const _infoItem(Icons.verified_user, "Status", "Aktif"),
+                _editableItem(
+                  icon: Icons.work,
+                  label: "Jabatan",
+                  controller: controller.jabatanC,
+                ),
+                _editableItem(
+                  icon: Icons.verified_user,
+                  label: "Status",
+                  controller: controller.statusC,
+                ),
                 const SizedBox(height: 12),
 
-                // ===== BUTTON STRUKTUR ORGANISASI =====
+                // ===== STRUKTUR ORGANISASI (TETAP ADA) =====
                 InkWell(
                   onTap: () {
                     Get.toNamed(Routes.strukturorganisasi);
@@ -93,35 +115,23 @@ class ProfileView extends StatelessWidget {
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                        255,
-                        122,
-                        0,
-                        0,
-                      ).withOpacity(0.1),
+                      color: maroon.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
-                      children: const [
-                        Icon(
-                          Icons.account_tree,
-                          color: Color.fromARGB(255, 122, 0, 0),
-                        ),
-                        SizedBox(width: 12),
+                      children: [
+                        Icon(Icons.account_tree, color: maroon),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             "Lihat Struktur Organisasi",
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: Color.fromARGB(255, 122, 0, 0),
+                              color: maroon,
                             ),
                           ),
                         ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 14,
-                          color: Color.fromARGB(255, 122, 0, 0),
-                        ),
+                        Icon(Icons.arrow_forward_ios, size: 14, color: maroon),
                       ],
                     ),
                   ),
@@ -131,22 +141,47 @@ class ProfileView extends StatelessWidget {
 
             const SizedBox(height: 24),
 
+            // ================= EDIT BUTTON =================
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Obx(
+                () => ElevatedButton.icon(
+                  onPressed: controller.toggleEdit,
+                  icon: Icon(
+                    controller.isEditing.value ? Icons.save : Icons.edit,
+                  ),
+                  label: Text(
+                    controller.isEditing.value
+                        ? "Simpan Perubahan"
+                        : "Edit Profil",
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: maroon,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
             // ================= LOGOUT =================
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: ElevatedButton.icon(
+              child: OutlinedButton.icon(
                 onPressed: () {
                   Get.offAllNamed(Routes.login);
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text("Keluar"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 122, 0, 0),
-                  foregroundColor: Colors.white,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: maroon,
+                  side: BorderSide(color: maroon),
                   minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 ),
               ),
             ),
@@ -165,6 +200,8 @@ class ProfileView extends StatelessWidget {
     required IconData icon,
     required List<Widget> children,
   }) {
+    const maroon = Color.fromARGB(255, 122, 0, 0);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
@@ -180,13 +217,13 @@ class ProfileView extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: const Color.fromARGB(255, 122, 0, 0)),
+              Icon(icon, color: maroon),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 122, 0, 0),
+                  color: maroon,
                   fontSize: 16,
                 ),
               ),
@@ -198,26 +235,41 @@ class ProfileView extends StatelessWidget {
       ),
     );
   }
-}
 
-// ================= INFO ITEM =================
-class _infoItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
+  // ================= EDITABLE ITEM =================
+  Widget _editableItem({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+  }) {
+    final profileC = Get.find<ProfileController>();
 
-  const _infoItem(this.icon, this.label, this.value);
+    return Obx(() {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: profileC.isEditing.value
+            ? TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelText: label,
+                  prefixIcon: Icon(icon),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              )
+            : _readonlyItem(icon, label, controller.text),
+      );
+    });
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
+  // ================= READONLY ITEM =================
+  Widget _readonlyItem(IconData icon, String label, String value) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+          Icon(icon, color: Colors.grey),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -225,17 +277,13 @@ class _infoItem extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
                     fontSize: 14,
                   ),
                 ),

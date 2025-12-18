@@ -25,7 +25,7 @@ class LoginView extends GetView<LoginController> {
               ),
               child: Column(
                 children: [
-                  Image.asset('assets/logomvbt.jpg', height: 100),
+                  Image.asset('assets/mvbtnobg.png', height: 100),
                   const SizedBox(height: 16),
                   const Text(
                     'MVBT ACTIVITY MANAGER',

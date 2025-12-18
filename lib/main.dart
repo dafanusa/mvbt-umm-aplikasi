@@ -70,7 +70,7 @@ class VolleyballActivityManagerApp extends StatelessWidget {
     final notifC = Get.find<NotificationController>();
 
     // ================= INITIAL ROUTE =================
-    String initialRoute = Routes.login;
+    String initialRoute = Routes.splash;
 
     // ✅ HANYA JIKA APP DIBUKA DARI TERMINATED NOTIF
     if (initialRouteFromNotification != null) {
