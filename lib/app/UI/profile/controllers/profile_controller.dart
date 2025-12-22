@@ -6,13 +6,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ProfileController extends GetxController {
   final isEditing = false.obs;
 
-  // DATA DARI LOGIN
-  final email = "".obs; // diisi dari login
+  final email = "".obs;
 
-  // DATA PROFILE
-  final namaLengkap = "Soekarno Hatta".obs;
-  final nim = "202310370311200".obs;
-  final jabatan = "Ketua Umum".obs;
+  final namaLengkap = "".obs; // default kosong
+  final nim = "".obs;
+  final jabatan = "".obs;
   final status = "Aktif".obs;
 
   late TextEditingController namaC;
@@ -22,12 +20,28 @@ class ProfileController extends GetxController {
 
   final supabase = Supabase.instance.client;
 
+  // 🔐 EMAIL ADMIN
+  final String adminEmail = "admin@gmail.com";
+
   @override
   void onInit() {
     super.onInit();
 
-    // CONTOH: email dari login
-    email.value = Get.arguments?['email'] ?? "user@gmail.com";
+    final user = supabase.auth.currentUser;
+    final authEmail = user?.email ?? "-";
+
+    // 🧠 LOGIC ADMIN / USER
+    if (authEmail == adminEmail) {
+      // admin login pakai email admin
+      email.value = adminEmail;
+      namaLengkap.value = adminEmail;
+      jabatan.value = "Admin";
+    } else {
+      // user biasa
+      email.value = authEmail;
+      namaLengkap.value = "";
+      jabatan.value = "Anggota";
+    }
 
     namaC = TextEditingController(text: namaLengkap.value);
     nimC = TextEditingController(text: nim.value);
@@ -37,13 +51,10 @@ class ProfileController extends GetxController {
 
   void toggleEdit() {
     if (isEditing.value) {
-      // SIMPAN
       namaLengkap.value = namaC.text;
       nim.value = nimC.text;
       jabatan.value = jabatanC.text;
       status.value = statusC.text;
-
-      // TODO: simpan ke Supabase / Firebase
     }
     isEditing.toggle();
   }
