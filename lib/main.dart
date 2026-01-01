@@ -93,3 +93,7 @@ class VolleyballActivityManagerApp extends StatelessWidget {
     });
   }
 }
+
+extension on NotificationController {
+  void setInitialPendingRoute(String s) {}
+}

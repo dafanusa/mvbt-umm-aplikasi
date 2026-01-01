@@ -1,17 +1,16 @@
 import 'package:get/get.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '/services/local_notification_service.dart';
 import '/app/routes/app_pages.dart';
 import '../../main_navigation/controllers/main_navigation_controller.dart';
 
 class NotificationController extends GetxController {
   final lastPayload = ''.obs;
-
-  /// 🔥 SUDAH ADA
   final pendingRoute = RxnString();
-
-  /// simpan index tab (jadwal / program)
   int? _pendingTabIndex;
+
+  final _supabase = Supabase.instance.client;
 
   // ===================================
   //              INIT
@@ -37,21 +36,34 @@ class NotificationController extends GetxController {
         final token = await FirebaseMessaging.instance.getToken();
         if (token != null) {
           print('🔥 FCM TOKEN: $token');
+          await _saveTokenToSupabase(token); // 🔥 PENTING
         }
       }
 
-      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      // 🔄 JIKA TOKEN BERUBAH
+      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
         print('🔄 FCM TOKEN UPDATED: $newToken');
+        await _saveTokenToSupabase(newToken);
       });
     } catch (e) {
       print('❌ FCM TOKEN ERROR: $e');
     }
   }
 
-  /// 🔴 TERMINATED (dipanggil dari main.dart)
-  void setInitialPendingRoute(String route) {
-    pendingRoute.value = route;
-    print("🔔 PENDING ROUTE diset dari main.dart: $route");
+  // ===================================
+  //     SIMPAN TOKEN KE SUPABASE
+  // ===================================
+  Future<void> _saveTokenToSupabase(String fcmtoken) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      return;
+    }
+
+    await _supabase.from('users').upsert({
+      'id': user.id,
+      'fcm_token': fcmtoken,
+      'updated_at': DateTime.now().toIso8601String(),
+    });
   }
 
   // =================================================
@@ -68,8 +80,6 @@ class NotificationController extends GetxController {
       body: message.notification?.body ?? '',
       payload: data,
     );
-
-    print('📩 FOREGROUND DATA: $data');
   }
 
   /// 🟡 BACKGROUND & 🔴 TERMINATED
@@ -89,13 +99,11 @@ class NotificationController extends GetxController {
     }
 
     // ============================
-    // BACKGROUND → MASUK MAIN NAV
+    // BACKGROUND → MAIN NAV
     // ============================
     if (fromBackground) {
       Get.offAllNamed(Routes.mainNavigation);
     }
-
-    print('🔔 Pending tab index: $_pendingTabIndex');
   }
 
   // ===================================

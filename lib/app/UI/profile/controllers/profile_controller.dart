@@ -1,14 +1,13 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import '../../login/controllers/login_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Tambahkan ini
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../routes/app_pages.dart'; // Sesuaikan dengan path routes Abang
 
 class ProfileController extends GetxController {
   final isEditing = false.obs;
-
   final email = "".obs;
-
-  final namaLengkap = "".obs; // default kosong
+  final namaLengkap = "".obs;
   final nim = "".obs;
   final jabatan = "".obs;
   final status = "Aktif".obs;
@@ -19,25 +18,19 @@ class ProfileController extends GetxController {
   late TextEditingController statusC;
 
   final supabase = Supabase.instance.client;
-
-  // 🔐 EMAIL ADMIN
   final String adminEmail = "admin@gmail.com";
 
   @override
   void onInit() {
     super.onInit();
-
     final user = supabase.auth.currentUser;
     final authEmail = user?.email ?? "-";
 
-    // 🧠 LOGIC ADMIN / USER
     if (authEmail == adminEmail) {
-      // admin login pakai email admin
       email.value = adminEmail;
       namaLengkap.value = adminEmail;
       jabatan.value = "Admin";
     } else {
-      // user biasa
       email.value = authEmail;
       namaLengkap.value = "";
       jabatan.value = "Anggota";
@@ -57,6 +50,25 @@ class ProfileController extends GetxController {
       status.value = statusC.text;
     }
     isEditing.toggle();
+  }
+
+  // 🔥 TARUH DI SINI BANG
+  Future<void> logout() async {
+    try {
+      // 1. Proses Logout dari Supabase (Hapus Session di Server)
+      await supabase.auth.signOut();
+
+      // 2. Bersihkan SharedPreferences (Hapus Role dll)
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      // 3. Tendang ke halaman Login dan hapus semua history page sebelumnya
+      Get.offAllNamed(Routes.login);
+
+      debugPrint("DEBUG: Logout berhasil, session dibersihkan.");
+    } catch (e) {
+      Get.snackbar("Error Logout", e.toString());
+    }
   }
 
   @override

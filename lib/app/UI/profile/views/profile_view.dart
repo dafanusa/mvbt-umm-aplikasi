@@ -170,11 +170,13 @@ class ProfileView extends GetView<ProfileController> {
             const SizedBox(height: 16),
 
             // ================= LOGOUT =================
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: OutlinedButton.icon(
                 onPressed: () {
-                  Get.offAllNamed(Routes.login);
+                  // Memanggil fungsi logout yang sudah kita buat di ProfileController
+                  controller.logout();
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text("Keluar"),
@@ -182,6 +184,9 @@ class ProfileView extends GetView<ProfileController> {
                   foregroundColor: maroon,
                   side: BorderSide(color: maroon),
                   minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),

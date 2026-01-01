@@ -5,6 +5,9 @@ import '../../../../services/local_notification_service.dart';
 import '../controllers/jadwal_controller.dart';
 import '../../login/controllers/login_controller.dart';
 import '../../../models/jadwal_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../app/UI/notification/controllers/notification_controller.dart';
 
 class JadwalView extends GetView<JadwalController> {
   const JadwalView({super.key, required Color maroon});
@@ -49,13 +52,25 @@ class JadwalView extends GetView<JadwalController> {
                       children: [
                         const SizedBox(height: 12),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            // 🔔 NOTIF UNTUK ADMIN SENDIRI (LOCAL)
                             LocalNotificationService.show(
                               title: "⏰ Reminder Latihan",
                               body: "Latihan akan dimulai dalam 1 jam!",
-                              payload: {"type": "jadwal_test"},
+                              payload: {"type": "jadwal"},
+                            );
+
+                            // 🚀 KIRIM KE SEMUA USER
+                            await Supabase.instance.client.functions.invoke(
+                              'send_notification_all_users',
+                              body: {
+                                "title": "⏰ Reminder Latihan",
+                                "body": "Latihan akan dimulai dalam 1 jam!",
+                                "data": {"type": "jadwal"},
+                              },
                             );
                           },
+
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color.fromARGB(
                               255,
